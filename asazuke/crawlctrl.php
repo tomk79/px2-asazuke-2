@@ -145,7 +145,7 @@ class pxplugin_asazuke_crawlctrl{
 
 		$this->msg( '--------------------------------------' );
 		$this->crawl_starttime = time();
-		$this->msg( '*** Start of Crawling --- '.$this->pcconf->fs()->int2datetime( $this->crawl_starttime ) );
+		$this->msg( '*** Start of Crawling --- '.$this->int2datetime( $this->crawl_starttime ) );
 		$this->msg( '' );
 
 		#--------------------------------------
@@ -631,11 +631,10 @@ class pxplugin_asazuke_crawlctrl{
 	private function save_start_and_end_datetime( $start_time , $end_time ){
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		$CONTENT = '';
-		$CONTENT .= $this->pcconf->fs()->int2datetime( $start_time );
+		$CONTENT .= $this->int2datetime( $start_time );
 		$CONTENT .= ' --- ';
-		$CONTENT .= $this->pcconf->fs()->int2datetime( $end_time );
+		$CONTENT .= $this->int2datetime( $end_time );
 		$result = $this->pcconf->fs()->save_file( $path_dir_download_to.'/__LOGS__/datetime.txt' , $CONTENT );
-		$this->pcconf->fs()->fclose( $path_dir_download_to.'/__LOGS__/datetime.txt' );
 		return	$result;
 	}
 
@@ -670,7 +669,7 @@ class pxplugin_asazuke_crawlctrl{
 			}
 		}
 		$this->crawl_endtime = time();
-		$this->msg( '*** Exit --- '.$this->pcconf->fs()->int2datetime( $this->crawl_endtime ) );
+		$this->msg( '*** Exit --- '.$this->int2datetime( $this->crawl_endtime ) );
 		$this->save_start_and_end_datetime( $this->crawl_starttime , $this->crawl_endtime );//←開始、終了時刻の記録
 		exit;
 	}
@@ -692,7 +691,6 @@ class pxplugin_asazuke_crawlctrl{
 			return	false;
 		}
 		$this->pcconf->fs()->save_file( $path , 'Cancel request: '.date('Y-m-d H:i:s')."\n" );
-		$this->pcconf->fs()->fclose( $path );
 		return	true;
 	}
 	private function is_request_cancel(){
@@ -740,7 +738,6 @@ class pxplugin_asazuke_crawlctrl{
 		}
 
 		$result = $this->pcconf->fs()->save_file( $lockfilepath , 'This lockfile created at: '.date( 'Y-m-d H:i:s' , time() ).'; Process ID: ['.getmypid().'];'."\n" );
-		$this->pcconf->fs()->fclose( $lockfilepath );
 		return	$result;
 	}
 
@@ -774,6 +771,16 @@ class pxplugin_asazuke_crawlctrl{
 	 */
 	private function get_path_lockfile(){
 		return	realpath( $this->get_path_download_to() ).'/crawl.lock';
+	}
+
+	/**
+	 * UNIXタイムスタンプの値を、datetime型に変換
+	 * 
+	 * @param int $time UNIXタイムスタンプ
+	 * @return string datetime型(YYYY-MM-DD HH:ii:ss) の文字列
+	 */
+	private function int2datetime( $time ){
+		return	date( 'Y-m-d H:i:s' , $time );
 	}
 
 }

@@ -11,6 +11,7 @@ class pxplugin_asazuke_model_program{
 
 	private $crawl_error_list = array();
 	private $info_program_id;
+	private $info_program_name;
 
 
 	/**
@@ -189,21 +190,24 @@ class pxplugin_asazuke_model_program{
 		return	$this->info_program_useragent;
 	}
 
-	#--------------------------------------
-	#	複製先パスの入出力
-	#	PicklesCrawler 0.3.3 追加
+	/**
+	 * 複製先パスの入力
+	 */
 	function set_path_copyto( $path ){
 		if( strlen( $path ) ){ $path = realpath( $path ); }
 		$this->info_path_copyto = $path;
 		return	true;
 	}
+	/**
+	 * 複製先パスの出力
+	 */
 	function get_path_copyto(){
 		return	$this->info_path_copyto;
 	}
 
-	#--------------------------------------
-	#	削除ファイル反映フラグの入出力
-	#	PicklesCrawler 0.3.3 追加
+	/**
+	 * 削除ファイル反映フラグの入力
+	 */
 	function set_copyto_apply_deletedfile_flg( $flg ){
 		if( $flg ){
 			$this->info_copyto_apply_deletedfile_flg = 1;
@@ -212,12 +216,16 @@ class pxplugin_asazuke_model_program{
 		}
 		return	true;
 	}
+	/**
+	 * 削除ファイル反映フラグの出力
+	 */
 	function get_copyto_apply_deletedfile_flg(){
 		return	$this->info_copyto_apply_deletedfile_flg;
 	}
 
-	#--------------------------------------
-	#	対象範囲URLリストの入出力
+	/**
+	 * 対象範囲URLリストの入出力
+	 */
 	function set_urllist_scope( $str_scope ){
 		$this->clear_urllist_scope();//一旦リセット
 		return	$this->put_urllist_scope( $str_scope );
@@ -277,8 +285,9 @@ class pxplugin_asazuke_model_program{
 		return	false;
 	}
 
-	#--------------------------------------
-	#	ダウンロードしないURLリストの入出力
+	/**
+	 * ダウンロードしないURLリストの入出力
+	 */
 	function set_urllist_nodownload( $str_nodownload ){
 		$this->clear_urllist_nodownload();//一旦リセット
 		return	$this->put_urllist_nodownload( $str_nodownload );
@@ -333,9 +342,9 @@ class pxplugin_asazuke_model_program{
 		return	false;
 	}
 
-	#--------------------------------------
-	#	受け取ったURLに、常に送信するパラメータをマージする
-	#	PicklesCrawler 0.3.0 追加
+	/**
+	 * 受け取ったURLに、常に送信するパラメータをマージする
+	 */
 	function merge_param( $URL ){
 		#	$URL は、POSTデータである場合があります
 
@@ -438,5 +447,3 @@ class pxplugin_asazuke_model_program{
 	}
 
 }
-
-?>

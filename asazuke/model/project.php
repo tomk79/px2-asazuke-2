@@ -60,10 +60,8 @@ class pxplugin_asazuke_model_project{
 		$this->set_path_docroot( $project_ini['common']['path_docroot'] );
 		$this->set_accept_html_file_max_size( $project_ini['common']['accept_html_file_max_size'] );
 
-		$this->px->dbh()->fclose( $path_project_dir.'/project.ini' );
-
 		#	select_cont_main
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/select_cont_main.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/select_cont_main.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -79,7 +77,7 @@ class pxplugin_asazuke_model_project{
 		unset($tmpAry);
 
 		#	select_cont_subs
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/select_cont_subs.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/select_cont_subs.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -98,7 +96,7 @@ class pxplugin_asazuke_model_project{
 
 
 		#	dom_convert
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/dom_convert.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/dom_convert.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -116,7 +114,7 @@ class pxplugin_asazuke_model_project{
 
 
 		#	select_breadcrumb
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/select_breadcrumb.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/select_breadcrumb.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -133,7 +131,7 @@ class pxplugin_asazuke_model_project{
 		unset($tmpAry);
 
 		#	replace_title
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/replace_title.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/replace_title.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -150,7 +148,7 @@ class pxplugin_asazuke_model_project{
 		unset($tmpAry);
 
 		#	replace_strings
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/replace_strings.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/replace_strings.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -166,7 +164,7 @@ class pxplugin_asazuke_model_project{
 		unset($tmpAry);
 
 		#	ignore_common_resources
-		$csv = $this->px->dbh()->read_csv_utf8( $path_project_dir.'/ignore_common_resources.csv' );
+		$csv = $this->read_csv_utf8( $path_project_dir.'/ignore_common_resources.csv' );
 		$tmpAry = array();
 		if(!is_array($csv)){
 			$csv = array();
@@ -268,10 +266,9 @@ class pxplugin_asazuke_model_project{
 
 		$project_ini_src .= ''."\n";
 
-		if( !$this->px->dbh()->save_file( $path_project_dir.'/project.ini' , $project_ini_src ) ){
+		if( !$this->pcconf->fs()->save_file( $path_project_dir.'/project.ini' , $project_ini_src ) ){
 			return	false;
 		}
-		$this->px->dbh()->fclose($path_project_dir.'/project.ini');
 
 		return	true;
 	}//save_project()
@@ -324,10 +321,10 @@ class pxplugin_asazuke_model_project{
 	 * iniファイルを読み込んで、配列にして返す。
 	 */
 	public function load_ini( $path_ini ){
-		if( !$this->px->dbh()->is_readable( $path_ini ) ){
+		if( !$this->pcconf->fs()->is_readable( $path_ini ) ){
 			return	false;
 		}
-		$ini_lines = $this->px->dbh()->file_get_lines( $path_ini );
+		$ini_lines = $this->pcconf->fs()->file_get_lines( $path_ini );
 		if( !is_array( $ini_lines ) ){
 			return	false;
 		}
@@ -550,6 +547,11 @@ class pxplugin_asazuke_model_project{
 		return	$RTN;
 	}//url2localpath()
 
-}
+	/**
+	 * UTF-8 のCSVファイルを読み込む
+	 */
+	private function read_csv_utf8( $path ){
+		return $this->pcconf->fs()->read_csv($path, array('charset'=>'utf-8'));
+	}
 
-?>
+}

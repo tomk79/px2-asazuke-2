@@ -15,6 +15,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	public function testStandard(){
 		$az = new pxplugin_asazuke_config();
 		$this->assertTrue( is_object($az) );
+		$az->set_home_dir(__DIR__.'/homedir/');
 		$crawlctrl = $az->factory_crawlctrl(array('run'));
 		$this->assertTrue( is_object($crawlctrl) );
 		$crawlctrl->start();
