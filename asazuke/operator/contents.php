@@ -6,7 +6,6 @@
  */
 class pxplugin_asazuke_operator_contents{
 
-	private $px;
 	private $obj_proj;
 	private $path = null;
 	private $report = array();
@@ -16,8 +15,7 @@ class pxplugin_asazuke_operator_contents{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $px, $obj_proj ){
-		$this->px = $px;
+	public function __construct( $obj_proj ){
 		$this->obj_proj = $obj_proj;
 	}
 
@@ -25,7 +23,7 @@ class pxplugin_asazuke_operator_contents{
 	 * ファクトリ：DOMパーサー
 	 */
 	private function &factory_dom_parser($path, $type = 'path'){
-		$className = $this->px->load_px_plugin_class( '/asazuke/resources/PxXMLDomParser.php' );
+		$className = 'pxplugin_asazuke_resources_PxXMLDomParser';
 		if( !$className ){
 			$this->error_log( 'DOMパーサーのロードに失敗しました。' , __FILE__ , __LINE__ );
 			return	$this->exit_process();

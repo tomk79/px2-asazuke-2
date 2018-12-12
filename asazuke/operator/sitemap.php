@@ -6,7 +6,6 @@
  */
 class pxplugin_asazuke_operator_sitemap{
 
-	private $px;
 	private $obj_proj;
 	private $path_sitemap_csv;
 	private $report = array();
@@ -14,8 +13,7 @@ class pxplugin_asazuke_operator_sitemap{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $px, $obj_proj, $path_sitemap_csv ){
-		$this->px = $px;
+	public function __construct( $obj_proj, $path_sitemap_csv ){
 		$this->obj_proj = $obj_proj;
 		$this->path_sitemap_csv = $path_sitemap_csv;
 	}
@@ -24,7 +22,7 @@ class pxplugin_asazuke_operator_sitemap{
 	 * ファクトリ：DOMパーサー
 	 */
 	private function &factory_dom_parser($path, $type = 'path'){
-		$className = $this->px->load_px_plugin_class( '/asazuke/resources/PxXMLDomParser.php' );
+		$className = 'pxplugin_asazuke_resources_PxXMLDomParser';
 		if( !$className ){
 			$this->error_log( 'DOMパーサーのロードに失敗しました。' , __FILE__ , __LINE__ );
 			return	$this->exit_process();

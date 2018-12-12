@@ -6,7 +6,6 @@
  */
 class pxplugin_asazuke_admin{
 
-	private $px;
 	private $pcconf;
 	private $cmd;
 
@@ -16,10 +15,9 @@ class pxplugin_asazuke_admin{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px, &$pcconf, $cmd ){
-		$this->px = &$px;
-		$this->pcconf = &$pcconf;
-		$this->cmd = &$cmd;
+	public function __construct( $pcconf, $cmd ){
+		$this->pcconf = $pcconf;
+		$this->cmd = $cmd;
 
 		$this->set_sitemap();
 	}

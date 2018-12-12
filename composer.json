@@ -9,7 +9,9 @@
         ]
     },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "tomk79/filesystem": "^1.0",
+        "tomk79/request": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.1.0"
@@ -23,7 +25,6 @@
             "asazuke/model/project.php",
             "asazuke/operator/contents.php",
             "asazuke/operator/sitemap.php",
-            "asazuke/resources/httpaccess.php",
             "asazuke/resources/io.php",
             "asazuke/resources/PxXMLDomParser.php",
             "asazuke/resources/tgz.php",

@@ -6,8 +6,6 @@
  */
 class pxplugin_asazuke_model_program{
 
-	private $px;
-
 	private $pcconf;
 	private $proj;
 
@@ -18,8 +16,7 @@ class pxplugin_asazuke_model_program{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px , &$pcconf , &$proj ){
-		$this->px = &$px;
+	public function __construct( &$pcconf , &$proj ){
 		$this->pcconf = &$pcconf;
 		$this->proj = &$proj;
 	}

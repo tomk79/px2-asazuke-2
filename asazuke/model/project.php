@@ -6,7 +6,6 @@
  */
 class pxplugin_asazuke_model_project{
 
-	private $px;
 	private $pcconf;
 
 	private $info_project_id;
@@ -26,22 +25,20 @@ class pxplugin_asazuke_model_project{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px , &$pcconf ){
-		$this->px = &$px;
-		$this->pcconf = &$pcconf;
+	public function __construct( $pcconf ){
+		$this->pcconf = $pcconf;
 	}
 
 
 	/**
 	 * ファクトリ：プログラムオブジェクトを生成
 	 */
-	public function &factory_program(){
-		$objPath = '/asazuke/model/program.php';
-		$className = $this->px->load_px_plugin_class( $objPath );
+	public function factory_program(){
+		$className = 'pxplugin_asazuke_model_program';
 		if( !$className ){
 			$this->px->error()->error_log( 'プログラムオブジェクトのロードに失敗しました。['.$objPath.']' , __FILE__ , __LINE__ );
 		}
-		$obj = new $className( $this->px , $this->pcconf , $this );
+		$obj = new $className( $this->pcconf , $this );
 		$obj->load_program();
 
 		return	$obj;

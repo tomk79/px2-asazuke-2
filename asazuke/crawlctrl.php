@@ -1,13 +1,10 @@
 <?php
 
 /**
- * クロールコントロール
- * Copyright (C)Tomoya Koyanagi.
- * Last Update: 12:53 2011/08/28
+ * Asazuke
  */
 class pxplugin_asazuke_crawlctrl{
 
-	private $px;
 	private $pcconf;
 	private $cmd;
 
@@ -25,32 +22,29 @@ class pxplugin_asazuke_crawlctrl{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px, &$pcconf, $cmd ){
-		$this->px = &$px;
-		$this->pcconf = &$pcconf;
-		$this->cmd = &$cmd;
+	public function __construct( $pcconf, $cmd ){
+		$this->pcconf = $pcconf;
+		$this->cmd = $cmd;
 
-		$this->project_model = &$this->pcconf->factory_model_project();
+		$this->project_model = $this->pcconf->factory_model_project();
 		$this->project_model->load_project();
 		$this->program_model = $this->project_model->factory_program();
 
-		if( strlen( $this->px->req()->get_param('crawl_max_url_number') ) ){
-			$this->pcconf->set_value( 'crawl_max_url_number' , intval( $this->px->req()->get_param('crawl_max_url_number') ) );
+		if( strlen( $this->pcconf->req()->get_param('crawl_max_url_number') ) ){
+			$this->pcconf->set_value( 'crawl_max_url_number' , intval( $this->pcconf->req()->get_param('crawl_max_url_number') ) );
 		}
-
-		error_reporting(4);
 	}
 
 	/**
 	 * ファクトリ：オペレータ：コンテンツ
 	 */
-	private function &factory_contents_operator(){
-		$className = $this->px->load_px_plugin_class( '/asazuke/operator/contents.php' );
+	private function factory_contents_operator(){
+		$className = 'pxplugin_asazuke_operator_contents';
 		if( !$className ){
 			$this->error_log( 'コンテンツオペレータのロードに失敗しました。' , __FILE__ , __LINE__ );
 			return	$this->exit_process();
 		}
-		$obj = new $className( $this->px, $this->project_model );
+		$obj = new $className( $this->project_model );
 		return	$obj;
 	}
 
@@ -58,31 +52,16 @@ class pxplugin_asazuke_crawlctrl{
 	/**
 	 * ファクトリ：オペレータ：サイトマップ
 	 */
-	private function &factory_sitemap_operator(){
-		$className = $this->px->load_px_plugin_class( '/asazuke/operator/sitemap.php' );
+	private function factory_sitemap_operator(){
+		$className = 'pxplugin_asazuke_operator_sitemap';
 		if( !$className ){
 			$this->error_log( 'サイトマップオペレータのロードに失敗しました。' , __FILE__ , __LINE__ );
 			return	$this->exit_process();
 		}
 		$path_sitemap_csv = realpath( $this->get_path_download_to() ).'/sitemaps/sitemap.csv';
-		$obj = new $className( $this->px, $this->project_model, $path_sitemap_csv );
+		$obj = new $className( $this->project_model, $path_sitemap_csv );
 		return	$obj;
 	}
-
-
-	/**
-	 * ファクトリ：HTTPアクセスオブジェクト
-	 */
-	private function &factory_httpaccess(){
-		$className = $this->px->load_px_plugin_class( '/asazuke/resources/httpaccess.php' );
-		if( !$className ){
-			$this->error_log( 'HTTPアクセスオブジェクトのロードに失敗しました。' , __FILE__ , __LINE__ );
-			return	$this->exit_process();
-		}
-		$obj = new $className();
-		return	$obj;
-	}
-
 
 
 	#########################################################################################################################################################
@@ -92,10 +71,10 @@ class pxplugin_asazuke_crawlctrl{
 	 * 処理の開始
 	 */
 	public function start(){
-		if( strlen( $this->px->req()->get_param('output_encoding') ) ){
-			$this->output_encoding = $this->px->req()->get_param('output_encoding');
+		if( strlen( $this->pcconf->req()->get_param('output_encoding') ) ){
+			$this->output_encoding = $this->pcconf->req()->get_param('output_encoding');
 		}
-		if( !is_null( $this->px->req()->get_param('-f') ) ){
+		if( !is_null( $this->pcconf->req()->get_param('-f') ) ){
 			#	-fオプション(force)が指定されていたら、
 			#	アプリケーションロックを無視する。
 			$this->unlock();
@@ -673,7 +652,7 @@ class pxplugin_asazuke_crawlctrl{
 	 */
 	private function msg( $msg ){
 		$msg = t::convert_encoding( $msg , $this->output_encoding , mb_internal_encoding() );
-		if( $this->px->req()->is_cmd() ){
+		if( $this->pcconf->req()->is_cmd() ){
 			print	$msg."\n";
 		}else{
 			print	$msg."\n";

@@ -3,19 +3,16 @@
 /**
  * インポート・エクスポート
  * Copyright (C)Tomoya Koyanagi.
- * Last Update : 0:52 2010/08/25
  */
 class pxplugin_asazuke_resources_io{
 
-	private $px;
 	private $pcconf;
 
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px, &$pcconf ){
-		$this->px = &$px;
-		$this->pcconf = &$pcconf;
+	public function __construct( $pcconf ){
+		$this->pcconf = $pcconf;
 	}
 
 	/**

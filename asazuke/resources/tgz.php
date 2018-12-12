@@ -14,8 +14,7 @@ class pxplugin_asazuke_resources_tgz{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px , $path_command_tar ){
-		$this->px = &$px;
+	public function __construct( $path_command_tar ){
 		$this->path_command_tar = $path_command_tar;
 	}
 

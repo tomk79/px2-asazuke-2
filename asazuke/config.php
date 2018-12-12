@@ -6,9 +6,8 @@
  */
 class pxplugin_asazuke_config{
 
-	#--------------------------------------
-	#	コアオブジェクト
-	private $px;
+	private $fs;
+	private $req;
 
 	#--------------------------------------
 	#	設定項目
@@ -43,8 +42,23 @@ class pxplugin_asazuke_config{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $px ){
-		$this->px = $px;
+	public function __construct(){
+		$this->fs = new \tomk79\filesystem();
+		$this->req = new \tomk79\request();
+	}
+
+	/**
+	 * $fs
+	 */
+	public function fs(){
+		return $this->fs;
+	}
+
+	/**
+	 * $req
+	 */
+	public function req(){
+		return $this->req;
 	}
 
 	/**
@@ -71,8 +85,8 @@ class pxplugin_asazuke_config{
 	 */
 	public function set_home_dir( $path ){
 		if( !strlen( $path ) ){ return false; }
-		$path = $this->px->dbh()->get_realpath( $path );
-		if( !$this->px->dbh()->is_writable( $path ) ){
+		$path = $this->fs->get_realpath( $path );
+		if( !$this->fs->is_writable( $path ) ){
 			return	false;
 		}
 
@@ -91,7 +105,7 @@ class pxplugin_asazuke_config{
 	 */
 	public function get_proj_dir(){
 		if( !is_dir( $this->get_home_dir().$this->localpath_proj_dir ) ){
-			if( !$this->px->dbh()->mkdir_all( $this->get_home_dir().$this->localpath_proj_dir ) ){
+			if( !$this->fs->mkdir_r( $this->get_home_dir().$this->localpath_proj_dir ) ){
 				return	false;
 			}
 		}
@@ -108,7 +122,7 @@ class pxplugin_asazuke_config{
 			return	false;
 		}
 		if( !is_dir( $proj_dir.'/prg' ) ){
-			if( !$this->px->dbh()->mkdir( $proj_dir.'/prg' ) ){
+			if( !$this->fs->mkdir( $proj_dir.'/prg' ) ){
 				return	false;
 			}
 		}
@@ -123,7 +137,7 @@ class pxplugin_asazuke_config{
 	 */
 	public function get_log_dir(){
 		if( !is_dir( $this->get_home_dir().$this->localpath_log_dir ) ){
-			if( !$this->px->dbh()->mkdir( $this->get_home_dir().$this->localpath_log_dir ) ){
+			if( !$this->fs->mkdir( $this->get_home_dir().$this->localpath_log_dir ) ){
 				return	false;
 			}
 		}
@@ -135,7 +149,7 @@ class pxplugin_asazuke_config{
 	 */
 	public function get_proc_dir(){
 		if( !is_dir( $this->get_home_dir().$this->localpath_proc_dir ) ){
-			if( !$this->px->dbh()->mkdir( $this->get_home_dir().$this->localpath_proc_dir ) ){
+			if( !$this->fs->mkdir( $this->get_home_dir().$this->localpath_proc_dir ) ){
 				return	false;
 			}
 		}
@@ -156,12 +170,12 @@ class pxplugin_asazuke_config{
 	/**
 	 * ファクトリ：プロジェクトモデル
 	 */
-	public function &factory_model_project(){
-		$className = $this->px->load_px_plugin_class( '/asazuke/model/project.php' );
+	public function factory_model_project(){
+		$className = 'pxplugin_asazuke_model_project';
 		if( !$className ){
 			return	false;
 		}
-		$obj = new $className( $this->px , $this );
+		$obj = new $className( $this );
 		return	$obj;
 	}
 
@@ -170,13 +184,13 @@ class pxplugin_asazuke_config{
 	/**
 	 * ファクトリ：管理画面インスタンスを取得
 	 */
-	public function &factory_admin($cmd){
-		$className = $this->px->load_px_plugin_class( '/asazuke/admin.php' );
+	public function factory_admin($cmd){
+		$className = 'pxplugin_asazuke_admin';
 		if( !$className ){
 			$this->px->error()->error_log( 'asazukeプラグイン「管理画面」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
 			return	false;
 		}
-		$obj = new $className( $this->px, $this, $cmd );
+		$obj = new $className( $this, $cmd );
 		return	$obj;
 	}
 
@@ -184,13 +198,13 @@ class pxplugin_asazuke_config{
 	/**
 	 * ファクトリ：クローラインスタンスを取得
 	 */
-	public function &factory_crawlctrl($cmd){
-		$className = $this->px->load_px_plugin_class( '/asazuke/crawlctrl.php' );
+	public function factory_crawlctrl($cmd){
+		$className = 'pxplugin_asazuke_crawlctrl';
 		if( !$className ){
 			$this->px->error()->error_log( 'asazukeプラグイン「クロールコントローラ」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
 			return	false;
 		}
-		$obj = new $className( $this->px, $this, $cmd );
+		$obj = new $className( $this, $cmd );
 		return	$obj;
 	}
 

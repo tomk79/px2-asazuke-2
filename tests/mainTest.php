@@ -13,7 +13,10 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * Test
 	 */
 	public function testStandard(){
-		$this->assertEquals( 1, 1 );
+		$az = new pxplugin_asazuke_config();
+		$this->assertTrue( is_object($az) );
+		$crawlctrl = $az->factory_crawlctrl(array('run'));
+		$this->assertTrue( is_object($crawlctrl) );
 	}
 
 }

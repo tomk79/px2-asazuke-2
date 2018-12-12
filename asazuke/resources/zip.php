@@ -7,14 +7,11 @@
  */
 class pxplugin_asazuke_resources_zip{
 
-	private $px;
-
 
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$px ){
-		$this->px = &$px;
+	public function __construct(){
 	}
 
 	/**
