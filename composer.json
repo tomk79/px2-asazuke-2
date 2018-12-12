@@ -1,0 +1,33 @@
+{
+    "name": "tomk79/px2-asazuke2",
+    "description": "Asazuke 2 は、既存のウェブサイトのデータを解析し、Pickles 2 の形式に置換するスクレイピングツールです。",
+    "keywords": ["pickles2"],
+    "license": "MIT",
+    "scripts": {
+        "test": [
+            "php ./vendor/phpunit/phpunit/phpunit"
+        ]
+    },
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.1.0"
+    },
+    "autoload": {
+        "files": [
+            "asazuke/crawlctrl.php",
+            "asazuke/admin.php",
+            "asazuke/config.php",
+            "asazuke/model/program.php",
+            "asazuke/model/project.php",
+            "asazuke/operator/contents.php",
+            "asazuke/operator/sitemap.php",
+            "asazuke/resources/httpaccess.php",
+            "asazuke/resources/io.php",
+            "asazuke/resources/PxXMLDomParser.php",
+            "asazuke/resources/tgz.php",
+            "asazuke/resources/zip.php"
+        ]
+    }
+}
