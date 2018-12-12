@@ -62,6 +62,13 @@ class pxplugin_asazuke_config{
 	}
 
 	/**
+	 * エラーログを出力
+	 */
+	public function error_log( $msg, $file, $line ){
+		echo( trim($msg).' - '.$file.' Line:'.$line."\n" );
+	}
+
+	/**
 	 * 設定値を取得
 	 */
 	public function get_value( $key ){
@@ -187,7 +194,7 @@ class pxplugin_asazuke_config{
 	public function factory_admin($cmd){
 		$className = 'pxplugin_asazuke_admin';
 		if( !$className ){
-			$this->px->error()->error_log( 'asazukeプラグイン「管理画面」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
+			$this->error_log( 'asazukeプラグイン「管理画面」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
 			return	false;
 		}
 		$obj = new $className( $this, $cmd );
@@ -201,7 +208,7 @@ class pxplugin_asazuke_config{
 	public function factory_crawlctrl($cmd){
 		$className = 'pxplugin_asazuke_crawlctrl';
 		if( !$className ){
-			$this->px->error()->error_log( 'asazukeプラグイン「クロールコントローラ」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
+			$this->error_log( 'asazukeプラグイン「クロールコントローラ」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
 			return	false;
 		}
 		$obj = new $className( $this, $cmd );

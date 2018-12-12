@@ -62,7 +62,7 @@ class pxplugin_asazuke_model_program{
 		}
 
 		set_time_limit(0);
-		$result = $this->px->dbh()->rm( $path_program_dir );
+		$result = $this->pcconf->fs()->rm( $path_program_dir );
 		set_time_limit(30);
 		if( $result === false ){
 			return	false;
@@ -86,11 +86,11 @@ class pxplugin_asazuke_model_program{
 		$path_program_dir = $this->pcconf->get_program_home_dir( $this->proj->get_project_id() , $this->get_program_id() );
 		$path_crawl_error_log = $path_program_dir.'/dl/__LOGS__/crawlerror.log';
 		if( !is_dir( dirname( $path_crawl_error_log ) ) || !is_writable( dirname( $path_crawl_error_log ) ) ){
-			$this->px->error()->error_log( 'Faild to save crawl error log. Directory ['.dirname( $path_crawl_error_log ).'] is NOT exists, or NOT writable.' , __FILE__ , __LINE__ );
+			$this->pcconf->error_log( 'Faild to save crawl error log. Directory ['.dirname( $path_crawl_error_log ).'] is NOT exists, or NOT writable.' , __FILE__ , __LINE__ );
 			return	false;
 		}
 		if( is_file( $path_crawl_error_log ) && !is_writable( $path_crawl_error_log ) ){
-			$this->px->error()->error_log( 'Faild to save crawl error log. File ['.$path_crawl_error_log.'] is NOT writable.' , __FILE__ , __LINE__ );
+			$this->pcconf->error_log( 'Faild to save crawl error log. File ['.$path_crawl_error_log.'] is NOT writable.' , __FILE__ , __LINE__ );
 			return	false;
 		}
 

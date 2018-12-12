@@ -3,15 +3,16 @@
 /**
  * zip形式のファイルの結合・展開
  * Copyright (C)Tomoya Koyanagi.
- * Last Update : 0:51 2008/12/08
  */
 class pxplugin_asazuke_resources_zip{
 
+	private $pcconf;
 
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct(){
+	public function __construct( $pcconf ){
+		$this->pcconf = $pcconf;
 	}
 
 	/**
@@ -50,7 +51,7 @@ class pxplugin_asazuke_resources_zip{
 	private function zip_add_directory( &$zip , $path_base , $path_local = null ){
 		if( !is_dir( $path_base.$path_local ) ){ return false; }
 
-		$dirlist = $this->px->dbh()->ls( $path_base.$path_local );
+		$dirlist = $this->pcconf->fs()->ls( $path_base.$path_local );
 		foreach( $dirlist as $basename ){
 			if( $basename == '.' || $basename == '..' ){ continue; }
 			if( is_dir( $path_base.$path_local.'/'.$basename ) ){

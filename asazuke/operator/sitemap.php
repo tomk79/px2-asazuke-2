@@ -23,10 +23,6 @@ class pxplugin_asazuke_operator_sitemap{
 	 */
 	private function &factory_dom_parser($path, $type = 'path'){
 		$className = 'pxplugin_asazuke_resources_PxXMLDomParser';
-		if( !$className ){
-			$this->error_log( 'DOMパーサーのロードに失敗しました。' , __FILE__ , __LINE__ );
-			return	$this->exit_process();
-		}
 		$obj = new $className( $path , $type );
 		return	$obj;
 	}
@@ -42,7 +38,7 @@ class pxplugin_asazuke_operator_sitemap{
 	 * スクレイピングを実行する
 	 */
 	public function scrape($path, $fullpath_savetmpfile_to){
-		$ext = $this->px->dbh()->get_extension($path);
+		$ext = $this->pcconf->fs()->get_extension($path);
 		switch( strtolower($ext) ){
 			case 'html':
 				break;
@@ -140,7 +136,7 @@ class pxplugin_asazuke_operator_sitemap{
 		foreach($links as $link){
 			$href = $link['attributes']['href'];
 			if( !preg_match('/^\//', $href) ){
-				$href = $this->px->dbh()->get_realpath(dirname($path).'/'.$href);
+				$href = $this->pcconf->fs()->get_realpath(dirname($path).'/'.$href);
 			}
 			$href = preg_replace('/\/index\.html((?:\?|\#).*)?$/', '/$1', $href);
 			if( $href == $this->obj_proj->get_path_startpage() ){
@@ -163,7 +159,7 @@ class pxplugin_asazuke_operator_sitemap{
 
 		}
 		$LINE = '';
-		$LINE .= $this->px->dbh()->mk_csv(array($sitemap_val_list), array('charset'=>'UTF-8'));
+		$LINE .= $this->pcconf->fs()->mk_csv(array($sitemap_val_list), array('charset'=>'UTF-8'));
 
 		error_log( $LINE , 3 , $this->path_sitemap_csv );
 		return true;

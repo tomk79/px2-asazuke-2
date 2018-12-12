@@ -36,7 +36,7 @@ class pxplugin_asazuke_model_project{
 	public function factory_program(){
 		$className = 'pxplugin_asazuke_model_program';
 		if( !$className ){
-			$this->px->error()->error_log( 'プログラムオブジェクトのロードに失敗しました。['.$objPath.']' , __FILE__ , __LINE__ );
+			$this->pcconf->error_log( 'プログラムオブジェクトのロードに失敗しました。['.$objPath.']' , __FILE__ , __LINE__ );
 		}
 		$obj = new $className( $this->pcconf , $this );
 		$obj->load_program();

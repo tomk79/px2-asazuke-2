@@ -124,7 +124,7 @@ class pxplugin_asazuke_crawlctrl{
 		#	ダウンロード先のパス内を一旦削除
 		$path_dir_download_to = $this->get_path_download_to();
 		if( is_dir( $path_dir_download_to ) ){
-			$filelist = $this->px->dbh()->ls( $path_dir_download_to );
+			$filelist = $this->pcconf->fs()->ls( $path_dir_download_to );
 			if( count( $filelist ) ){
 				$this->msg( '--------------------------------------' );
 				$this->msg( 'Cleanning directory ['.$path_dir_download_to.']...' );
@@ -132,7 +132,7 @@ class pxplugin_asazuke_crawlctrl{
 				foreach( $filelist as $filename ){
 					if( $filename == '..' || $filename == '.' ){ continue; }
 					if( $filename == 'crawl.lock' ){ continue; } //ロックファイルは消しちゃダメ。
-					if( !$this->px->dbh()->rm( $path_dir_download_to.'/'.$filename ) ){
+					if( !$this->pcconf->fs()->rm( $path_dir_download_to.'/'.$filename ) ){
 						$this->error_log( 'Delete ['.$filename.'] FAILD.' , __FILE__ , __LINE__ );
 						return	$this->exit_process();
 					}else{
@@ -145,7 +145,7 @@ class pxplugin_asazuke_crawlctrl{
 
 		$this->msg( '--------------------------------------' );
 		$this->crawl_starttime = time();
-		$this->msg( '*** Start of Crawling --- '.$this->px->dbh()->int2datetime( $this->crawl_starttime ) );
+		$this->msg( '*** Start of Crawling --- '.$this->pcconf->fs()->int2datetime( $this->crawl_starttime ) );
 		$this->msg( '' );
 
 		#--------------------------------------
@@ -243,7 +243,7 @@ class pxplugin_asazuke_crawlctrl{
 				$fullpath_save_to = str_replace( '\\' , '/' , $fullpath_save_to );
 				$fullpath_savetmpfile_to = $path_dir_download_to.'/tmp_downloadcontent.tmp';
 
-				$fullpath_from = $this->px->dbh()->get_realpath($project_model->get_path_docroot().$url);
+				$fullpath_from = $this->pcconf->fs()->get_realpath($project_model->get_path_docroot().$url);
 
 				clearstatcache();
 
@@ -251,7 +251,7 @@ class pxplugin_asazuke_crawlctrl{
 				// オリジナルを、一時ファイルにコピー
 				$original_filesize = filesize($fullpath_from);
 				$this->msg( 'original file size : '.$original_filesize.' byte(s)' );
-				if( !$this->px->dbh()->copy( $fullpath_from, $fullpath_savetmpfile_to ) ){
+				if( !$this->pcconf->fs()->copy( $fullpath_from, $fullpath_savetmpfile_to ) ){
 					$this->error_log( 'クロール対象のファイル ['.$url.'] を一時ファイルに保存できませんでした。' , __FILE__ , __LINE__ );
 					$program_model->crawl_error( 'FAILD to copy file to; ['.$fullpath_save_to.']' , $url , $fullpath_save_to );
 				}
@@ -287,7 +287,7 @@ class pxplugin_asazuke_crawlctrl{
 							$this->error_log( 'コンテンツ設置先にファイルは存在せず、親ディレクトリに書き込み権限がありません。' , __FILE__ , __LINE__ );
 						}
 					}else{
-						if( !$this->px->dbh()->mkdir_all( dirname( $fullpath_save_to ) ) || !is_dir( dirname( $fullpath_save_to ) ) ){
+						if( !$this->pcconf->fs()->mkdir_all( dirname( $fullpath_save_to ) ) || !is_dir( dirname( $fullpath_save_to ) ) ){
 							$this->error_log( 'コンテンツ設置先ディレクトリの作成に失敗しました。' , __FILE__ , __LINE__ );
 						}
 					}
@@ -349,7 +349,7 @@ class pxplugin_asazuke_crawlctrl{
 						'url'=>$url ,
 						'errors'=>$result_cont['errors'] ,
 						'original_filesize'=>$original_filesize ,
-						'extension'=>$this->px->dbh()->get_extension($url) ,
+						'extension'=>$this->pcconf->fs()->get_extension($url) ,
 						'title'=>$result_sitemap['title'] ,
 						'title:replace_pattern'=>$result_sitemap['title:replace_pattern'] ,
 						'main_contents:pattern'=>$result_cont['main_contents:pattern'] ,
@@ -432,14 +432,14 @@ class pxplugin_asazuke_crawlctrl{
 		}
 
 		// スキャン開始
-		$ls = $this->px->dbh()->ls( $path_base.$path );
+		$ls = $this->pcconf->fs()->ls( $path_base.$path );
 		foreach( $ls as $base_name ){
 			set_time_limit(30);
 			if( is_dir( $path_base.$path.$base_name ) ){
 				// 再帰処理
 				$this->scan_starting_files($project_model, $path.$base_name.'/');
 			}elseif( is_file( $path_base.$path.$base_name ) ){
-				$ext = $this->px->dbh()->get_extension( $path_base.$path.$base_name );
+				$ext = $this->pcconf->fs()->get_extension( $path_base.$path.$base_name );
 				$target_path = '/'.$path.$base_name;
 				switch( strtolower($ext) ){
 					case 'html':
@@ -530,7 +530,7 @@ class pxplugin_asazuke_crawlctrl{
 
 		$RTN = realpath( $path ).'/dl';
 		if( !is_dir( $RTN ) ){
-			if( !$this->px->dbh()->mkdir( $RTN ) ){
+			if( !$this->pcconf->fs()->mkdir( $RTN ) ){
 				return	false;
 			}
 		}
@@ -544,7 +544,7 @@ class pxplugin_asazuke_crawlctrl{
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
 		if( !is_dir( $path_dir_download_to.'/__LOGS__' ) ){
-			if( !$this->px->dbh()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
+			if( !$this->pcconf->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
 				return	false;
 			}
 		}
@@ -564,10 +564,10 @@ class pxplugin_asazuke_crawlctrl{
 		#	/ 行の文字コードを調整
 		#--------------------------------------
 
-		$csv_line = $this->px->dbh()->mk_csv( array( $array_csv_line ) , array('charset'=>$csv_charset) );
+		$csv_line = $this->pcconf->fs()->mk_csv( array( $array_csv_line ) , array('charset'=>$csv_charset) );
 
 		error_log( $csv_line , 3 , $path_dir_download_to.'/__LOGS__/execute_list.csv' );
-		$this->px->dbh()->chmod( $path_dir_download_to.'/__LOGS__/execute_list.csv' );
+		$this->pcconf->fs()->chmod( $path_dir_download_to.'/__LOGS__/execute_list.csv' );
 
 		return	true;
 	}//save_executed_url_row();
@@ -580,7 +580,7 @@ class pxplugin_asazuke_crawlctrl{
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
 		if( !is_dir( $path_dir_download_to.'/__LOGS__' ) ){
-			if( !$this->px->dbh()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
+			if( !$this->pcconf->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
 				return	false;
 			}
 		}
@@ -593,7 +593,7 @@ class pxplugin_asazuke_crawlctrl{
 
 
 		error_log( $FIN , 3 , $path_dir_download_to.'/__LOGS__/settings.txt' );
-		$this->px->dbh()->chmod( $path_dir_download_to.'/__LOGS__/settings.txt' );
+		$this->pcconf->fs()->chmod( $path_dir_download_to.'/__LOGS__/settings.txt' );
 
 		return	true;
 	}//save_crawl_settings();
@@ -605,7 +605,7 @@ class pxplugin_asazuke_crawlctrl{
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
 		if( !is_dir( $path_dir_download_to.'/sitemaps' ) ){
-			if( !$this->px->dbh()->mkdir( $path_dir_download_to.'/sitemaps' ) ){
+			if( !$this->pcconf->fs()->mkdir( $path_dir_download_to.'/sitemaps' ) ){
 				return	false;
 			}
 		}
@@ -617,10 +617,10 @@ class pxplugin_asazuke_crawlctrl{
 
 		}
 		$LINE = '';
-		$LINE .= $this->px->dbh()->mk_csv(array($sitemap_key_list), array('charset'=>'UTF-8'));
+		$LINE .= $this->pcconf->fs()->mk_csv(array($sitemap_key_list), array('charset'=>'UTF-8'));
 
 		error_log( $LINE , 3 , $path_dir_download_to.'/sitemaps/sitemap.csv' );
-		$this->px->dbh()->chmod( $path_dir_download_to.'/sitemaps/sitemap.csv' );
+		$this->pcconf->fs()->chmod( $path_dir_download_to.'/sitemaps/sitemap.csv' );
 
 		return	true;
 	}
@@ -631,11 +631,11 @@ class pxplugin_asazuke_crawlctrl{
 	private function save_start_and_end_datetime( $start_time , $end_time ){
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		$CONTENT = '';
-		$CONTENT .= $this->px->dbh()->int2datetime( $start_time );
+		$CONTENT .= $this->pcconf->fs()->int2datetime( $start_time );
 		$CONTENT .= ' --- ';
-		$CONTENT .= $this->px->dbh()->int2datetime( $end_time );
-		$result = $this->px->dbh()->save_file( $path_dir_download_to.'/__LOGS__/datetime.txt' , $CONTENT );
-		$this->px->dbh()->fclose( $path_dir_download_to.'/__LOGS__/datetime.txt' );
+		$CONTENT .= $this->pcconf->fs()->int2datetime( $end_time );
+		$result = $this->pcconf->fs()->save_file( $path_dir_download_to.'/__LOGS__/datetime.txt' , $CONTENT );
+		$this->pcconf->fs()->fclose( $path_dir_download_to.'/__LOGS__/datetime.txt' );
 		return	$result;
 	}
 
@@ -643,7 +643,7 @@ class pxplugin_asazuke_crawlctrl{
 	 * エラーログを残す
 	 */
 	private function error_log( $msg , $file = null , $line = null ){
-		$this->px->error()->error_log( $msg , $file , $line );
+		$this->pcconf->error_log( $msg , $file , $line );
 		$this->msg( '[--ERROR!!--] '.$msg );
 		return	true;
 	}
@@ -671,10 +671,9 @@ class pxplugin_asazuke_crawlctrl{
 			}
 		}
 		$this->crawl_endtime = time();
-		$this->msg( '*** Exit --- '.$this->px->dbh()->int2datetime( $this->crawl_endtime ) );
+		$this->msg( '*** Exit --- '.$this->pcconf->fs()->int2datetime( $this->crawl_endtime ) );
 		$this->save_start_and_end_datetime( $this->crawl_starttime , $this->crawl_endtime );//←開始、終了時刻の記録
 		exit;
-		//return	$this->px->theme()->print_and_exit( '' );
 	}
 
 
@@ -693,8 +692,8 @@ class pxplugin_asazuke_crawlctrl{
 		}elseif( !is_writable( dirname( $path ) ) ){
 			return	false;
 		}
-		$this->px->dbh()->save_file( $path , 'Cancel request: '.date('Y-m-d H:i:s')."\n" );
-		$this->px->dbh()->fclose( $path );
+		$this->pcconf->fs()->save_file( $path , 'Cancel request: '.date('Y-m-d H:i:s')."\n" );
+		$this->pcconf->fs()->fclose( $path );
 		return	true;
 	}
 	private function is_request_cancel(){
@@ -711,7 +710,7 @@ class pxplugin_asazuke_crawlctrl{
 		}elseif( !is_writable( $path ) ){
 			return	false;
 		}
-		return	$this->px->dbh()->rm( $path );
+		return	$this->pcconf->fs()->rm( $path );
 	}
 
 
@@ -725,7 +724,7 @@ class pxplugin_asazuke_crawlctrl{
 		$lockfilepath = $this->get_path_lockfile();
 
 		if( !@is_dir( dirname( $lockfilepath ) ) ){
-			$this->px->dbh()->mkdir_all( dirname( $lockfilepath ) );
+			$this->pcconf->fs()->mkdir_all( dirname( $lockfilepath ) );
 		}
 
 		#	PHPのFileStatusCacheをクリア
@@ -741,8 +740,8 @@ class pxplugin_asazuke_crawlctrl{
 			}
 		}
 
-		$result = $this->px->dbh()->save_file( $lockfilepath , 'This lockfile created at: '.date( 'Y-m-d H:i:s' , time() ).'; Process ID: ['.getmypid().'];'."\n" );
-		$this->px->dbh()->fclose( $lockfilepath );
+		$result = $this->pcconf->fs()->save_file( $lockfilepath , 'This lockfile created at: '.date( 'Y-m-d H:i:s' , time() ).'; Process ID: ['.getmypid().'];'."\n" );
+		$this->pcconf->fs()->fclose( $lockfilepath );
 		return	$result;
 	}
 
@@ -768,7 +767,7 @@ class pxplugin_asazuke_crawlctrl{
 		#	PHPのFileStatusCacheをクリア
 		clearstatcache();
 
-		return	$this->px->dbh()->rm( $lockfilepath );
+		return	$this->pcconf->fs()->rm( $lockfilepath );
 	}
 
 	/**

@@ -700,7 +700,7 @@ class pxplugin_asazuke_admin{
 			#	tarコマンドが使えたら(UNIXのみ)
 			$className = $this->px->load_px_plugin_class( '/asazuke/resources/tgz.php' );
 			if( !$className ){
-				$this->px->error()->error_log( 'tgzライブラリのロードに失敗しました。' , __FILE__ , __LINE__ );
+				$this->pcconf->error_log( 'tgzライブラリのロードに失敗しました。' , __FILE__ , __LINE__ );
 				return	'<p class="error">tgzライブラリのロードに失敗しました。</p>';
 			}
 			$obj_tgz = new $className( $this->px , $this->pcconf->get_path_command('tar') );
@@ -728,7 +728,7 @@ class pxplugin_asazuke_admin{
 			#	ZIP関数が有効だったら
 			$className = $this->px->load_px_plugin_class( '/asazuke/resources/zip.php' );
 			if( !$className ){
-				$this->px->error()->error_log( 'zipライブラリのロードに失敗しました。' , __FILE__ , __LINE__ );
+				$this->pcconf->error_log( 'zipライブラリのロードに失敗しました。' , __FILE__ , __LINE__ );
 				return	'<p class="error">zipライブラリのロードに失敗しました。</p>';
 			}
 			$obj_zip = new $className( $this->px );

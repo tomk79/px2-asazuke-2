@@ -35,12 +35,8 @@ class pxplugin_asazuke_resources_io{
 
 		if( strtolower($ziptype) == 'tgz' && strlen( $this->pcconf->get_path_command('tar') ) ){
 			#	tarコマンドが使えたら(UNIXのみ)
-			$className = $this->px->load_px_plugin_class( '/asazuke/resources/tgz.php' );
-			if( !$className ){
-				$this->px->error()->error_log( 'tgzライブラリのロードに失敗しました。' , __FILE__ , __LINE__ );
-				return false;
-			}
-			$obj_tgz = new $className( $this->px, $this->pcconf->get_path_command('tar') );
+			$className = 'pxplugin_asazuke_resources_tgz';
+			$obj_tgz = new $className( $this->pcconf, $this->pcconf->get_path_command('tar') );
 
 			if( !$obj_tgz->zip( $download_content_path , $download_zipto_path.'.tgz' ) ){
 				return false;//圧縮に失敗しました。
@@ -54,12 +50,8 @@ class pxplugin_asazuke_resources_io{
 
 		}elseif( strtolower($ziptype) == 'zip' && class_exists( 'ZipArchive' ) ){
 			#	ZIP関数が有効だったら
-			$className = $this->px->load_px_plugin_class( '/asazuke/resources/zip.php' );
-			if( !$className ){
-				$this->px->error()->error_log( 'zipライブラリのロードに失敗しました。' , __FILE__ , __LINE__ );
-				return false;
-			}
-			$obj_zip = new $className( $this->px );
+			$className = 'pxplugin_asazuke_resources_zip';
+			$obj_zip = new $className( $this->pcconf );
 
 			if( !$obj_zip->zip( $download_content_path , $download_zipto_path.'.zip' ) ){
 				return false;//圧縮に失敗しました。
@@ -86,16 +78,16 @@ class pxplugin_asazuke_resources_io{
 	private function local_export( $options = array() ){
 		$path_export_dir = $this->pcconf->get_home_dir().'/_export/';
 
-		$this->px->dbh()->rm( $path_export_dir );
-		$this->px->dbh()->mkdir_all( $path_export_dir );
-		$this->px->dbh()->mkdir_all( $path_export_dir.'tmp/' );
+		$this->pcconf->fs()->rm( $path_export_dir );
+		$this->pcconf->fs()->mkdir_r( $path_export_dir );
+		$this->pcconf->fs()->mkdir_r( $path_export_dir.'tmp/' );
 
-		$projList = $this->px->dbh()->ls( $this->pcconf->get_home_dir().'/proj/' );
+		$projList = $this->pcconf->fs()->ls( $this->pcconf->get_home_dir().'/proj/' );
 		foreach( $projList as $project_id ){
 			if( @count( $options['project'] ) && !$options['project'][$project_id] ){
 				continue;
 			}
-			$this->px->dbh()->mkdir_all( $path_export_dir.'tmp/'.$project_id.'/' );
+			$this->pcconf->fs()->mkdir_r( $path_export_dir.'tmp/'.$project_id.'/' );
 			$this->local_export_project(
 				$this->pcconf->get_home_dir().'/proj/'.$project_id.'/' ,
 				$path_export_dir.'tmp/'.$project_id.'/'
@@ -109,15 +101,15 @@ class pxplugin_asazuke_resources_io{
 	 * プロジェクトをエクスポートフォルダにコピーする
 	 */
 	private function local_export_project( $from , $to ){
-		$projFileList = $this->px->dbh()->ls( $from );
+		$projFileList = $this->pcconf->fs()->ls( $from );
 		foreach( $projFileList as $project_filename ){
 			$tmp_path = $from.$project_filename;
 			if( is_dir( $tmp_path ) ){
-				$this->px->dbh()->mkdir_all( $to.$project_filename.'/' );
+				$this->pcconf->fs()->mkdir_r( $to.$project_filename.'/' );
 				if( $project_filename == 'prg' ){
-					$projPrgList = $this->px->dbh()->ls( $from.$project_filename.'/' );
+					$projPrgList = $this->pcconf->fs()->ls( $from.$project_filename.'/' );
 					foreach( $projPrgList as $program_id ){
-						$this->px->dbh()->mkdir_all( $to.$project_filename.'/'.$program_id.'/' );
+						$this->pcconf->fs()->mkdir_r( $to.$project_filename.'/'.$program_id.'/' );
 						$result = $this->local_export_program(
 							$from.$project_filename.'/'.$program_id.'/' ,
 							$to.$project_filename.'/'.$program_id.'/'
@@ -125,7 +117,7 @@ class pxplugin_asazuke_resources_io{
 					}
 				}
 			}elseif( is_file( $tmp_path ) ){
-				$this->px->dbh()->copy(
+				$this->pcconf->fs()->copy(
 					$tmp_path ,
 					$to.$project_filename
 				);
@@ -139,16 +131,16 @@ class pxplugin_asazuke_resources_io{
 	 */
 	private function local_export_program( $from , $to ){
 		if( !is_dir( $from ) ){ return false; }
-		$from = $this->px->dbh()->get_realpath( $from ).'/';
+		$from = $this->pcconf->fs()->get_realpath( $from ).'/';
 		if( !is_dir( $to ) ){ return false; }
-		$to = $this->px->dbh()->get_realpath( $to ).'/';
+		$to = $this->pcconf->fs()->get_realpath( $to ).'/';
 
-		$prgFileList = $this->px->dbh()->ls( $from );
+		$prgFileList = $this->pcconf->fs()->ls( $from );
 		foreach( $prgFileList as $prgFile ){
 			if( is_dir( $from.$prgFile ) ){
-				$this->px->dbh()->mkdir($to.$prgFile);
+				$this->pcconf->fs()->mkdir($to.$prgFile);
 			}elseif( is_file( $from.$prgFile ) ){
-				$this->px->dbh()->copy(
+				$this->pcconf->fs()->copy(
 					$from.$prgFile ,
 					$to.$prgFile
 				);

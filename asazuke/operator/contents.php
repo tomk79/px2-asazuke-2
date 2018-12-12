@@ -22,12 +22,8 @@ class pxplugin_asazuke_operator_contents{
 	/**
 	 * ファクトリ：DOMパーサー
 	 */
-	private function &factory_dom_parser($path, $type = 'path'){
+	private function factory_dom_parser($path, $type = 'path'){
 		$className = 'pxplugin_asazuke_resources_PxXMLDomParser';
-		if( !$className ){
-			$this->error_log( 'DOMパーサーのロードに失敗しました。' , __FILE__ , __LINE__ );
-			return	$this->exit_process();
-		}
 		$obj = new $className( $path, $type );
 		return	$obj;
 	}
@@ -44,22 +40,22 @@ class pxplugin_asazuke_operator_contents{
 	 */
 	public function scrape($path, $fullpath_savetmpfile_to , $fullpath_save_to){
 		$this->path = $path;
-		$ext = $this->px->dbh()->get_extension($this->path);
+		$ext = $this->pcconf->fs()->get_extension($this->path);
 		switch( strtolower($ext) ){
 			case 'html':
 				break;
 			default:
 				// HTML以外はコピーするだけ。
-				$this->px->dbh()->mkdir_all( dirname($fullpath_save_to) );
-				return $this->px->dbh()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
+				$this->pcconf->fs()->mkdir_all( dirname($fullpath_save_to) );
+				return $this->pcconf->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
 				break;
 		}
 
 		if( $this->obj_proj->get_accept_html_file_max_size() > 0 && filesize( $fullpath_savetmpfile_to ) > $this->obj_proj->get_accept_html_file_max_size() ){
 			// 設定より大きいファイルは、コピーするだけ。
 			$this->report['errors'] = '[error] file size '.filesize( $fullpath_savetmpfile_to ).' byte(s) is over accept_html_file_max_size '.$this->obj_proj->get_accept_html_file_max_size().' byte(s).';
-			$this->px->dbh()->mkdir_all( dirname($fullpath_save_to) );
-			return $this->px->dbh()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
+			$this->pcconf->fs()->mkdir_all( dirname($fullpath_save_to) );
+			return $this->pcconf->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
 		}
 
 		$content_src = '';
@@ -78,7 +74,7 @@ class pxplugin_asazuke_operator_contents{
 
 		$content_src = preg_replace( '/\r\n|\r|\n/si', "\r\n", $content_src );//CRLFに変換
 
-		$result = $this->px->dbh()->file_overwrite( $fullpath_save_to, $content_src );
+		$result = $this->pcconf->fs()->file_overwrite( $fullpath_save_to, $content_src );
 		return $result;
 	}//scrape()
 
@@ -139,7 +135,7 @@ class pxplugin_asazuke_operator_contents{
 	public function callback_replace_dom_script( $dom , $num ){
 		$src = trim($dom['attributes']['src']);
 		if( !preg_match('/^\//', $src) ){
-			$src = $this->px->dbh()->get_realpath( dirname($this->path).'/'.$src );
+			$src = $this->pcconf->fs()->get_realpath( dirname($this->path).'/'.$src );
 		}
 		if( $this->obj_proj->is_ignore_common_resources( $src ) ){
 			// 除外リソースなら削除する
@@ -160,7 +156,7 @@ class pxplugin_asazuke_operator_contents{
 		}
 		$href = trim($dom['attributes']['href']);
 		if( !preg_match('/^\//', $href) ){
-			$href = $this->px->dbh()->get_realpath( dirname($this->path).'/'.$href );
+			$href = $this->pcconf->fs()->get_realpath( dirname($this->path).'/'.$href );
 		}
 		if( $this->obj_proj->is_ignore_common_resources( $href ) ){
 			// 除外リソースなら削除する

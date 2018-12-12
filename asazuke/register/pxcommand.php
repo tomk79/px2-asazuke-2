@@ -25,7 +25,7 @@ class pxplugin_asazuke_register_pxcommand extends px_bases_pxcommand{
 
 		#--------------------------------------
 		#    PicklesCrawler コンフィグを生成
-		$className = $this->px->load_px_plugin_class( '/asazuke/config.php' );
+		$className = 'pxplugin_asazuke_config';
 		$pcconf = new $className( $this->px );
 
 		#--------------------------------------
