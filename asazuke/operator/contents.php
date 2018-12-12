@@ -110,7 +110,7 @@ class pxplugin_asazuke_operator_contents{
 		$src .= '<'.'?php ob_start(); ?'.'>'."\n";
 		$src .= '<'.'?php /* ------ head section contents ------ */ ?'.'>'."\n";
 		$src .= $header_src."\n";
-		$src .= '<'.'?php $px->theme()->send_content(ob_get_clean(), '.t::data2text( 'head' ).'); ?'.'>'."\n";
+		$src .= '<'.'?php $px->theme()->send_content(ob_get_clean(), '.json_encode( 'head' ).'); ?'.'>'."\n";
 		$src .= "\n";
 
 		return $src;
@@ -209,9 +209,9 @@ class pxplugin_asazuke_operator_contents{
 				continue;
 			}
 			$src .= '<'.'?php ob_start(); ?'.'>'."\n";
-			$src .= '<'.'?php /* ------ sub contents '.t::data2text( $ruleRow['cabinet_name'] ).' ------ */ ?'.'>'."\n";
+			$src .= '<'.'?php /* ------ sub contents '.json_encode( $ruleRow['cabinet_name'] ).' ------ */ ?'.'>'."\n";
 			$src .= $this->src_standard_replacement( $tmpDOM[$ruleRow['index']]['innerHTML'] )."\n";
-			$src .= '<'.'?php $px->theme()->send_content(ob_get_clean(), '.t::data2text( $ruleRow['cabinet_name'] ).'); ?'.'>'."\n";
+			$src .= '<'.'?php $px->theme()->send_content(ob_get_clean(), '.json_encode( $ruleRow['cabinet_name'] ).'); ?'.'>'."\n";
 			$src .= "\n";
 
 			// 報告

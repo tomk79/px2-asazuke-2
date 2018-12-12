@@ -82,7 +82,7 @@ class pxplugin_asazuke_config{
 	 */
 	public function set_value( $key , $val ){
 		if( !preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/' , $key ) ){ return false; }
-		@eval( '$this->conf_'.strtolower( $key ).' = '.text::data2text( $val ).';' );
+		@eval( '$this->conf_'.strtolower( $key ).' = '.json_encode( $val ).';' );
 		return	true;
 	}
 
@@ -189,20 +189,6 @@ class pxplugin_asazuke_config{
 
 
 	/**
-	 * ファクトリ：管理画面インスタンスを取得
-	 */
-	public function factory_admin($cmd){
-		$className = 'pxplugin_asazuke_admin';
-		if( !$className ){
-			$this->error_log( 'asazukeプラグイン「管理画面」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
-			return	false;
-		}
-		$obj = new $className( $this, $cmd );
-		return	$obj;
-	}
-
-
-	/**
 	 * ファクトリ：クローラインスタンスを取得
 	 */
 	public function factory_crawlctrl($cmd){
@@ -216,5 +202,3 @@ class pxplugin_asazuke_config{
 	}
 
 }
-
-?>

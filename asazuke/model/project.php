@@ -524,7 +524,7 @@ class pxplugin_asazuke_model_project{
 						$replace_to = urlencode( preg_replace( '/^.*\.(.*?)$/' , '$1' , $PATH ) );
 						break;
 					case 'basename_body':
-						$replace_to = basename( t::trimext( $PATH ) );
+						$replace_to = basename( $this->pcconf->fs()->trim_extension( $PATH ) );
 						break;
 					case 'wildcard':
 						if( intval($rule_result[2][$i]) > 0 ){

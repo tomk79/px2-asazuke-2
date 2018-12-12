@@ -525,7 +525,7 @@ class pxplugin_asazuke_crawlctrl{
 	 * ダウンロード先のディレクトリパスを得る
 	 */
 	private function get_path_download_to(){
-		$path = $this->pcconf->get_program_home_dir( $this->cmd[1] , $this->cmd[2] );
+		$path = $this->pcconf->get_program_home_dir();
 		if( !is_dir( $path ) ){ return false; }
 
 		$RTN = realpath( $path ).'/dl';
@@ -651,7 +651,6 @@ class pxplugin_asazuke_crawlctrl{
 	 * メッセージを出力する
 	 */
 	private function msg( $msg ){
-		$msg = t::convert_encoding( $msg , $this->output_encoding , mb_internal_encoding() );
 		if( $this->pcconf->req()->is_cmd() ){
 			print	$msg."\n";
 		}else{
@@ -778,5 +777,3 @@ class pxplugin_asazuke_crawlctrl{
 	}
 
 }
-
-?>

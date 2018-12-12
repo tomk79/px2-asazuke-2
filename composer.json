@@ -18,9 +18,8 @@
     },
     "autoload": {
         "files": [
-            "asazuke/crawlctrl.php",
-            "asazuke/admin.php",
             "asazuke/config.php",
+            "asazuke/crawlctrl.php",
             "asazuke/model/program.php",
             "asazuke/model/project.php",
             "asazuke/operator/contents.php",

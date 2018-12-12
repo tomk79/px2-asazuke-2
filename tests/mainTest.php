@@ -17,6 +17,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 		$this->assertTrue( is_object($az) );
 		$crawlctrl = $az->factory_crawlctrl(array('run'));
 		$this->assertTrue( is_object($crawlctrl) );
+		$crawlctrl->start();
 	}
 
 }
