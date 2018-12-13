@@ -35,16 +35,6 @@ class model_project{
 
 
 	/**
-	 * ファクトリ：プログラムオブジェクトを生成
-	 */
-	public function factory_program(){
-		$obj = new model_program( $this->az , $this );
-		$obj->load_program();
-
-		return	$obj;
-	}
-
-	/**
 	 * 既存のプロジェクト情報を開いて、メンバにセット。
 	 */
 	public function load_project(){

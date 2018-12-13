@@ -13,7 +13,6 @@ class crawlctrl{
 	private $cmd;
 
 	private $project_model;
-	private $program_model;
 
 	private $target_path_list = array();	//実行待ちURLの一覧
 	private $done_url_count = 0;		//実行済みURLの数
@@ -32,7 +31,6 @@ class crawlctrl{
 
 		$this->project_model = $this->az->factory_model_project();
 		$this->project_model->load_project();
-		$this->program_model = $this->project_model->factory_program();
 
 		if( strlen( $this->az->req()->get_param('crawl_max_url_number') ) ){
 			$this->az->set_value( 'crawl_max_url_number' , intval( $this->az->req()->get_param('crawl_max_url_number') ) );
@@ -90,8 +88,7 @@ class crawlctrl{
 	 */
 	private function controll(){
 
-		$project_model = &$this->project_model;
-		$program_model = &$this->program_model;
+		$project_model = $this->project_model;
 
 		$this->msg( '---------- Asazuke 2 for Pickles 2 ----------' );
 		$this->msg( 'Copyright (C)Tomoya Koyanagi, All rights reserved.' );
@@ -109,7 +106,7 @@ class crawlctrl{
 		#--------------------------------------
 		#	ロック中か否かを判断
 		if( !$this->lock() ){
-			$error_msg = 'This program ['.$program_model->get_program_name().'] is locked.';
+			$error_msg = 'This program is locked.';
 			$this->error_log( $error_msg , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
@@ -196,7 +193,6 @@ class crawlctrl{
 			if( $this->is_request_cancel() ){
 				//キャンセル要求を検知したらば、中断して抜ける。
 				$cancel_message = 'This operation has been canceled.';
-				$program_model->crawl_error( $cancel_message );
 				$this->msg( $cancel_message );
 				break;
 			}
@@ -205,7 +201,6 @@ class crawlctrl{
 				if( $this->is_request_cancel() ){
 					//キャンセル要求を検知したらば、中断して抜ける。
 					$cancel_message = 'This operation has been canceled.';
-					$program_model->crawl_error( $cancel_message );
 					$this->msg( $cancel_message );
 					break 2;
 				}
@@ -250,7 +245,6 @@ class crawlctrl{
 				$this->msg( 'original file size : '.$original_filesize.' byte(s)' );
 				if( !$this->az->fs()->copy( $fullpath_from, $fullpath_savetmpfile_to ) ){
 					$this->error_log( 'クロール対象のファイル ['.$url.'] を一時ファイルに保存できませんでした。' , __FILE__ , __LINE__ );
-					$program_model->crawl_error( 'FAILD to copy file to; ['.$fullpath_save_to.']' , $url , $fullpath_save_to );
 				}
 
 				clearstatcache();
@@ -293,11 +287,9 @@ class crawlctrl{
 
 					if( !$obj_contents_operator->scrape( $url, $fullpath_savetmpfile_to, $fullpath_save_to ) ){
 						$this->error_log( 'コンテンツのスクレイピングに失敗しました。' , __FILE__ , __LINE__ );
-						$program_model->crawl_error( 'FAILD to scraping file; ['.$fullpath_save_to.']' , $url , $fullpath_save_to );
 					}
 					if( !unlink($fullpath_savetmpfile_to) ){
 						$this->error_log( '一時ファイルの削除に失敗しました。' , __FILE__ , __LINE__ );
-						$program_model->crawl_error( 'FAILD to delete temporary file to; ['.$fullpath_savetmpfile_to.']' , $url , $fullpath_savetmpfile_to );
 					}
 
 					clearstatcache();
@@ -335,11 +327,6 @@ class crawlctrl{
 
 				#--------------------------------------
 				#	完了のメモを残す
-				$tmp_crawlerror = '';
-				$tmp_crawlerror_list = $program_model->get_crawl_error();
-				foreach( $tmp_crawlerror_list as $tmp_crawlerror_line ){
-					$tmp_crawlerror .= $tmp_crawlerror_line['errormsg']."\n";
-				}
 				$this->target_url_done( $url );
 				$this->save_executed_url_row(
 					array(
@@ -356,9 +343,6 @@ class crawlctrl{
 						'time'=>date('Y/m/d H:i:s') ,
 					)
 				);
-				unset( $tmp_crawlerror );
-				unset( $tmp_crawlerror_list );
-				unset( $tmp_crawlerror_line );
 				#	/ 完了のメモを残す
 				#--------------------------------------
 
@@ -391,7 +375,6 @@ class crawlctrl{
 				if( $this->get_count_done_url() >= $this->az->get_value( 'crawl_max_url_number' ) ){
 					#	処理可能な最大URL数を超えたらおしまい。
 					$message_string = 'URL count is OVER '.$this->az->get_value( 'crawl_max_url_number' ).'.';
-					$program_model->crawl_error( $message_string );
 					$this->msg( $message_string );
 					$this->progress_report( 'message' , $message_string );
 					break 2;
