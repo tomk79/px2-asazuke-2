@@ -610,7 +610,7 @@ class pxplugin_asazuke_crawlctrl{
 			}
 		}
 
-		$sitemap_definition = $this->px->site()->get_sitemap_definition();
+		$sitemap_definition = $this->pcconf->get_sitemap_definition();
 		$sitemap_key_list = array();
 		foreach( $sitemap_definition as $row ){
 			array_push( $sitemap_key_list , '* '.$row['key'] );

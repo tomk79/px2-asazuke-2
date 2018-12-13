@@ -152,7 +152,7 @@ class pxplugin_asazuke_operator_sitemap{
 	 * サイトマップ行を書き出す
 	 */
 	private function save_sitemap_row( $row_info ){
-		$sitemap_definition = $this->px->site()->get_sitemap_definition();
+		$sitemap_definition = $this->pcconf->get_sitemap_definition();
 		$sitemap_val_list = array();
 		foreach( $sitemap_definition as $row ){
 			array_push( $sitemap_val_list , $row_info[$row['key']] );
