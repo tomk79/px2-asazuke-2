@@ -22,6 +22,8 @@ class mainTest extends PHPUnit_Framework_TestCase{
 			"path_output" => $path_output,
 			"path_startpage" => "/",
 			"accept_html_file_max_size" => 10000000,
+			"crawl_max_url_number" => 10000000, // 1回のクロールで処理できる最大URL数, URLなので、画像などのリソースファイルも含まれる。
+			"download_list_csv_charset" => "UTF-8", // ダウンロードリストCSVの文字コード: `null` が指定される場合、 `mb_internal_encoding()` を参照する。
 			"select_cont_main" => array(
 				array(
 					"name" => "Primary Contents 1",

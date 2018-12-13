@@ -20,7 +20,6 @@ class crawlctrl{
 	private $crawl_starttime = 0;//クロール開始時刻
 	private $crawl_endtime = 0;//クロール終了時刻
 
-	private $output_encoding = 'UTF-8';// 出力文字セット
 
 	/**
 	 * コンストラクタ
@@ -31,10 +30,6 @@ class crawlctrl{
 
 		$this->project_model = $this->az->factory_model_project();
 		$this->project_model->load_project();
-
-		if( strlen( $this->az->req()->get_param('crawl_max_url_number') ) ){
-			$this->az->set_value( 'crawl_max_url_number' , intval( $this->az->req()->get_param('crawl_max_url_number') ) );
-		}
 	}
 
 	/**
@@ -63,18 +58,8 @@ class crawlctrl{
 	 * 処理の開始
 	 */
 	public function start(){
-		if( strlen( $this->az->req()->get_param('output_encoding') ) ){
-			$this->output_encoding = $this->az->req()->get_param('output_encoding');
-		}
-		if( !is_null( $this->az->req()->get_param('-f') ) ){
-			#	-fオプション(force)が指定されていたら、
-			#	アプリケーションロックを無視する。
-			$this->unlock();
-		}
-
-
 		while( @ob_end_clean() );//出力バッファをクリア
-		@header( 'Content-type: text/plain; charset='.$this->output_encoding );
+		@header( 'Content-type: text/plain; charset=UTF-8' );
 
 		return	$this->controll();
 	}
@@ -99,12 +84,12 @@ class crawlctrl{
 		$this->msg( 'Start page path => '.$project_model->get_path_startpage() );
 		$this->msg( 'Output directory path => '.$this->az->get_output_dir() );
 		$this->msg( 'Accept HTML file max size => '.$project_model->get_accept_html_file_max_size() );
-		$this->msg( 'crawl_max_url_number => '.$this->az->get_value( 'crawl_max_url_number' ) );
+		$this->msg( 'crawl_max_url_number => '.$this->az->config()['crawl_max_url_number'] );
 		if( !is_dir( $this->az->get_output_dir() ) ){
 			$this->error_log( 'Config error: path_output is NOT a directory.' , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
-		if( !is_int( $this->az->get_value( 'crawl_max_url_number' ) ) ){
+		if( !is_int( $this->az->config()['crawl_max_url_number'] ) ){
 			$this->error_log( 'Config error: crawl_max_url_number is NOT a number.' , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
@@ -231,7 +216,7 @@ class crawlctrl{
 				}
 
 				// $path_save_to = $project_model->url2localpath( $url , $url_property['post'] );
-				$path_save_to = '/htdocs'.$url;
+				$path_save_to = '/contents'.$url;
 				$this->msg( 'save to ['.$path_save_to.']' );
 
 				$this->progress_report( 'url' , $url );
@@ -378,9 +363,9 @@ class crawlctrl{
 				$this->msg( '残件数 '.count( $this->target_path_list ).' 件.' );
 				$this->progress_report( 'progress' , intval( $this->get_count_done_url() ).'/'.count( $this->target_path_list ) );
 
-				if( $this->get_count_done_url() >= $this->az->get_value( 'crawl_max_url_number' ) ){
+				if( $this->get_count_done_url() >= $this->az->config()['crawl_max_url_number'] ){
 					#	処理可能な最大URL数を超えたらおしまい。
-					$message_string = 'URL count is OVER '.$this->az->get_value( 'crawl_max_url_number' ).'.';
+					$message_string = 'URL count is OVER '.$this->az->config()['crawl_max_url_number'].'.';
 					$this->msg( $message_string );
 					$this->progress_report( 'message' , $message_string );
 					break 2;
@@ -529,15 +514,15 @@ class crawlctrl{
 	private function save_executed_url_row( $array_csv_line = array() ){
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
-		if( !is_dir( $path_dir_download_to.'/__LOGS__' ) ){
-			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
+		if( !is_dir( $path_dir_download_to.'/_logs' ) ){
+			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/_logs' ) ){
 				return	false;
 			}
 		}
 
 		$csv_charset = mb_internal_encoding();
-		if( strlen( $this->az->get_value( 'download_list_csv_charset' ) ) ){
-			$csv_charset = $this->az->get_value( 'download_list_csv_charset' );
+		if( strlen( $this->az->config()['download_list_csv_charset'] ) ){
+			$csv_charset = $this->az->config()['download_list_csv_charset'];
 		}
 
 		#--------------------------------------
@@ -552,8 +537,8 @@ class crawlctrl{
 
 		$csv_line = $this->az->fs()->mk_csv( array( $array_csv_line ) , array('charset'=>$csv_charset) );
 
-		error_log( $csv_line , 3 , $path_dir_download_to.'/__LOGS__/execute_list.csv' );
-		$this->az->fs()->chmod( $path_dir_download_to.'/__LOGS__/execute_list.csv' );
+		error_log( $csv_line , 3 , $path_dir_download_to.'/_logs/execute_list.csv' );
+		$this->az->fs()->chmod( $path_dir_download_to.'/_logs/execute_list.csv' );
 
 		return	true;
 	}//save_executed_url_row();
@@ -565,8 +550,8 @@ class crawlctrl{
 		// PicklesCrawler 0.4.2 追加
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
-		if( !is_dir( $path_dir_download_to.'/__LOGS__' ) ){
-			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
+		if( !is_dir( $path_dir_download_to.'/_logs' ) ){
+			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/_logs' ) ){
 				return	false;
 			}
 		}
@@ -578,8 +563,8 @@ class crawlctrl{
 
 
 
-		error_log( $FIN , 3 , $path_dir_download_to.'/__LOGS__/settings.txt' );
-		$this->az->fs()->chmod( $path_dir_download_to.'/__LOGS__/settings.txt' );
+		error_log( $FIN , 3 , $path_dir_download_to.'/_logs/settings.txt' );
+		$this->az->fs()->chmod( $path_dir_download_to.'/_logs/settings.txt' );
 
 		return	true;
 	}//save_crawl_settings();
@@ -620,7 +605,7 @@ class crawlctrl{
 		$CONTENT .= $this->int2datetime( $start_time );
 		$CONTENT .= ' --- ';
 		$CONTENT .= $this->int2datetime( $end_time );
-		$result = $this->az->fs()->save_file( $path_dir_download_to.'/__LOGS__/datetime.txt' , $CONTENT );
+		$result = $this->az->fs()->save_file( $path_dir_download_to.'/_logs/datetime.txt' , $CONTENT );
 		return	$result;
 	}
 
@@ -636,11 +621,7 @@ class crawlctrl{
 	 * メッセージを出力する
 	 */
 	private function msg( $msg ){
-		if( $this->az->req()->is_cmd() ){
-			print	$msg."\n";
-		}else{
-			print	$msg."\n";
-		}
+		print	$msg."\n";
 		flush();
 		return	true;
 	}
@@ -667,7 +648,7 @@ class crawlctrl{
 	 * キャンセルリクエスト
 	 */
 	public function request_cancel(){
-		$path = realpath( $this->get_path_download_to() ).'/__LOGS__/cancel.request';
+		$path = realpath( $this->get_path_download_to() ).'/_logs/cancel.request';
 		if( !is_dir( dirname( $path ) ) ){
 			return	false;
 		}
@@ -680,14 +661,14 @@ class crawlctrl{
 		return	true;
 	}
 	private function is_request_cancel(){
-		$path = realpath( $this->get_path_download_to() ).'/__LOGS__/cancel.request';
+		$path = realpath( $this->get_path_download_to() ).'/_logs/cancel.request';
 		if( is_file( $path ) ){
 			return	true;
 		}
 		return	false;
 	}
 	public function delete_request_cancel(){
-		$path = realpath( $this->get_path_download_to() ).'/__LOGS__/cancel.request';
+		$path = realpath( $this->get_path_download_to() ).'/_logs/cancel.request';
 		if( !is_file( $path ) ){
 			return	true;
 		}elseif( !is_writable( $path ) ){
@@ -732,10 +713,7 @@ class crawlctrl{
 	 */
 	private function touch_lockfile(){
 		$lockfilepath = $this->get_path_lockfile();
-
-		#	PHPのFileStatusCacheをクリア
 		clearstatcache();
-
 		touch( $lockfilepath );
 		return	true;
 	}
@@ -745,10 +723,7 @@ class crawlctrl{
 	 */
 	private function unlock(){
 		$lockfilepath = $this->get_path_lockfile();
-
-		#	PHPのFileStatusCacheをクリア
 		clearstatcache();
-
 		return	$this->az->fs()->rm( $lockfilepath );
 	}
 
@@ -756,7 +731,7 @@ class crawlctrl{
 	 * ロックファイルのパスを返す
 	 */
 	private function get_path_lockfile(){
-		return	realpath( $this->get_path_download_to() ).'/crawl.lock';
+		return $this->az->fs()->get_realpath( $this->get_path_download_to().'/crawl.lock' );
 	}
 
 	/**

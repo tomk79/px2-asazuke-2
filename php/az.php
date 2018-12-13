@@ -11,40 +11,12 @@ namespace tomk79\pickles2\asazuke2;
 class az{
 
 	private $fs;
-	private $req;
-
 	private $config;
 
 	#--------------------------------------
 	#	設定項目
-
-	/** プロジェクトディレクトリ */
-	private $localpath_proj_dir = '/proj';
-
-	/** ログディレクトリ */
-	private $localpath_log_dir = '/logs';
-
-	/** プロセス記憶ディレクトリ */
-	private $localpath_proc_dir = '/proc';
-
-	/**
-	 * 1回のクロールで処理できる最大URL数
-	 * URLなので、画像などのリソースファイルも含まれる。
-	 */
 	private $conf_crawl_max_url_number = 10000000;
-
-	/**
-	 * クロール結果を管理画面からダウンロードするときに、
-	 * ファイル名にクロール日時を含めるか否か
-	 */
-	private $conf_dl_datetime_in_filename = true;
-
-	/**
-	 * ダウンロードリストCSVの文字コード
-	 * `null` が指定される場合、 `mb_internal_encoding()` を参照する。
-	 */
 	private $conf_download_list_csv_charset = 'SJIS-win';
-
 	#	/ 設定項目
 	#--------------------------------------
 
@@ -58,7 +30,6 @@ class az{
 		}
 		$this->config = $config;
 		$this->fs = new \tomk79\filesystem();
-		$this->req = new \tomk79\request();
 	}
 
 	/**
@@ -66,13 +37,6 @@ class az{
 	 */
 	public function fs(){
 		return $this->fs;
-	}
-
-	/**
-	 * $req
-	 */
-	public function req(){
-		return $this->req;
 	}
 
 	/**
@@ -87,24 +51,6 @@ class az{
 	 */
 	public function error_log( $msg, $file, $line ){
 		echo( trim($msg).' - '.$file.' Line:'.$line."\n" );
-	}
-
-	/**
-	 * 設定値を取得
-	 */
-	public function get_value( $key ){
-		if( !preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/' , $key ) ){ return false; }
-		$RTN = @eval( 'return $this->conf_'.strtolower( $key ).';' );
-		return	$RTN;
-	}
-
-	/**
-	 * 値を設定
-	 */
-	public function set_value( $key , $val ){
-		if( !preg_match( '/^[a-zA-Z][a-zA-Z0-9_]*$/' , $key ) ){ return false; }
-		@eval( '$this->conf_'.strtolower( $key ).' = '.json_encode( $val ).';' );
-		return	true;
 	}
 
 
