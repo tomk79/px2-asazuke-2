@@ -1,18 +1,22 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * インポート・エクスポート
  * Copyright (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_resources_io{
+class resources_io{
 
-	private $pcconf;
+	private $az;
 
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $pcconf ){
-		$this->pcconf = $pcconf;
+	public function __construct( $az ){
+		$this->az = $az;
 	}
 
 	/**
@@ -25,7 +29,7 @@ class pxplugin_asazuke_resources_io{
 			return false;
 		}
 
-		$path_export_dir = $this->pcconf->get_home_dir().'/_export/';
+		$path_export_dir = $this->az->get_home_dir().'/_export/';
 
 		$download_content_path = $path_export_dir.'tmp/';
 		$download_zipto_path = $path_export_dir.'PxCrawer_export_'.date('Ymd_His');
@@ -33,10 +37,9 @@ class pxplugin_asazuke_resources_io{
 			return false;//←圧縮対象が存在しません。
 		}
 
-		if( strtolower($ziptype) == 'tgz' && strlen( $this->pcconf->get_path_command('tar') ) ){
+		if( strtolower($ziptype) == 'tgz' && strlen( $this->az->get_path_command('tar') ) ){
 			#	tarコマンドが使えたら(UNIXのみ)
-			$className = 'pxplugin_asazuke_resources_tgz';
-			$obj_tgz = new $className( $this->pcconf, $this->pcconf->get_path_command('tar') );
+			$obj_tgz = new resources_tgz( $this->az, $this->az->get_path_command('tar') );
 
 			if( !$obj_tgz->zip( $download_content_path , $download_zipto_path.'.tgz' ) ){
 				return false;//圧縮に失敗しました。
@@ -50,8 +53,7 @@ class pxplugin_asazuke_resources_io{
 
 		}elseif( strtolower($ziptype) == 'zip' && class_exists( 'ZipArchive' ) ){
 			#	ZIP関数が有効だったら
-			$className = 'pxplugin_asazuke_resources_zip';
-			$obj_zip = new $className( $this->pcconf );
+			$obj_zip = new resources_zip( $this->az );
 
 			if( !$obj_zip->zip( $download_content_path , $download_zipto_path.'.zip' ) ){
 				return false;//圧縮に失敗しました。
@@ -76,20 +78,20 @@ class pxplugin_asazuke_resources_io{
 	 * エクスポートデータを作成
 	 */
 	private function local_export( $options = array() ){
-		$path_export_dir = $this->pcconf->get_home_dir().'/_export/';
+		$path_export_dir = $this->az->get_home_dir().'/_export/';
 
-		$this->pcconf->fs()->rm( $path_export_dir );
-		$this->pcconf->fs()->mkdir_r( $path_export_dir );
-		$this->pcconf->fs()->mkdir_r( $path_export_dir.'tmp/' );
+		$this->az->fs()->rm( $path_export_dir );
+		$this->az->fs()->mkdir_r( $path_export_dir );
+		$this->az->fs()->mkdir_r( $path_export_dir.'tmp/' );
 
-		$projList = $this->pcconf->fs()->ls( $this->pcconf->get_home_dir().'/proj/' );
+		$projList = $this->az->fs()->ls( $this->az->get_home_dir().'/proj/' );
 		foreach( $projList as $project_id ){
 			if( @count( $options['project'] ) && !$options['project'][$project_id] ){
 				continue;
 			}
-			$this->pcconf->fs()->mkdir_r( $path_export_dir.'tmp/'.$project_id.'/' );
+			$this->az->fs()->mkdir_r( $path_export_dir.'tmp/'.$project_id.'/' );
 			$this->local_export_project(
-				$this->pcconf->get_home_dir().'/proj/'.$project_id.'/' ,
+				$this->az->get_home_dir().'/proj/'.$project_id.'/' ,
 				$path_export_dir.'tmp/'.$project_id.'/'
 			);
 		}
@@ -101,15 +103,15 @@ class pxplugin_asazuke_resources_io{
 	 * プロジェクトをエクスポートフォルダにコピーする
 	 */
 	private function local_export_project( $from , $to ){
-		$projFileList = $this->pcconf->fs()->ls( $from );
+		$projFileList = $this->az->fs()->ls( $from );
 		foreach( $projFileList as $project_filename ){
 			$tmp_path = $from.$project_filename;
 			if( is_dir( $tmp_path ) ){
-				$this->pcconf->fs()->mkdir_r( $to.$project_filename.'/' );
+				$this->az->fs()->mkdir_r( $to.$project_filename.'/' );
 				if( $project_filename == 'prg' ){
-					$projPrgList = $this->pcconf->fs()->ls( $from.$project_filename.'/' );
+					$projPrgList = $this->az->fs()->ls( $from.$project_filename.'/' );
 					foreach( $projPrgList as $program_id ){
-						$this->pcconf->fs()->mkdir_r( $to.$project_filename.'/'.$program_id.'/' );
+						$this->az->fs()->mkdir_r( $to.$project_filename.'/'.$program_id.'/' );
 						$result = $this->local_export_program(
 							$from.$project_filename.'/'.$program_id.'/' ,
 							$to.$project_filename.'/'.$program_id.'/'
@@ -117,7 +119,7 @@ class pxplugin_asazuke_resources_io{
 					}
 				}
 			}elseif( is_file( $tmp_path ) ){
-				$this->pcconf->fs()->copy(
+				$this->az->fs()->copy(
 					$tmp_path ,
 					$to.$project_filename
 				);
@@ -131,16 +133,16 @@ class pxplugin_asazuke_resources_io{
 	 */
 	private function local_export_program( $from , $to ){
 		if( !is_dir( $from ) ){ return false; }
-		$from = $this->pcconf->fs()->get_realpath( $from ).'/';
+		$from = $this->az->fs()->get_realpath( $from ).'/';
 		if( !is_dir( $to ) ){ return false; }
-		$to = $this->pcconf->fs()->get_realpath( $to ).'/';
+		$to = $this->az->fs()->get_realpath( $to ).'/';
 
-		$prgFileList = $this->pcconf->fs()->ls( $from );
+		$prgFileList = $this->az->fs()->ls( $from );
 		foreach( $prgFileList as $prgFile ){
 			if( is_dir( $from.$prgFile ) ){
-				$this->pcconf->fs()->mkdir($to.$prgFile);
+				$this->az->fs()->mkdir($to.$prgFile);
 			}elseif( is_file( $from.$prgFile ) ){
-				$this->pcconf->fs()->copy(
+				$this->az->fs()->copy(
 					$from.$prgFile ,
 					$to.$prgFile
 				);

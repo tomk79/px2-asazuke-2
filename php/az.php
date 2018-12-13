@@ -1,10 +1,14 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
- * Pickles Crawler 機能設定
+ * Asazuke 2
  * @author Tomoya Koyanagi <tomk79@gmail.com>
  */
-class pxplugin_asazuke_config{
+class az{
 
 	private $fs;
 	private $req;
@@ -178,11 +182,7 @@ class pxplugin_asazuke_config{
 	 * ファクトリ：プロジェクトモデル
 	 */
 	public function factory_model_project(){
-		$className = 'pxplugin_asazuke_model_project';
-		if( !$className ){
-			return	false;
-		}
-		$obj = new $className( $this );
+		$obj = new model_project( $this );
 		return	$obj;
 	}
 
@@ -192,12 +192,7 @@ class pxplugin_asazuke_config{
 	 * ファクトリ：クローラインスタンスを取得
 	 */
 	public function factory_crawlctrl($cmd){
-		$className = 'pxplugin_asazuke_crawlctrl';
-		if( !$className ){
-			$this->error_log( 'asazukeプラグイン「クロールコントローラ」の読み込みに失敗しました。' , __FILE__ , __LINE__ );
-			return	false;
-		}
-		$obj = new $className( $this, $cmd );
+		$obj = new crawlctrl( $this, $cmd );
 		return	$obj;
 	}
 

@@ -13,7 +13,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * Test
 	 */
 	public function testStandard(){
-		$az = new pxplugin_asazuke_config();
+		$az = new tomk79\pickles2\asazuke2\az();
 		$this->assertTrue( is_object($az) );
 		$az->set_home_dir(__DIR__.'/homedir/');
 		$crawlctrl = $az->factory_crawlctrl(array('run'));

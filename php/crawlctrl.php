@@ -1,11 +1,15 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
- * Asazuke
+ * Asazuke 2
  */
-class pxplugin_asazuke_crawlctrl{
+class crawlctrl{
 
-	private $pcconf;
+	private $az;
 	private $cmd;
 
 	private $project_model;
@@ -22,16 +26,16 @@ class pxplugin_asazuke_crawlctrl{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $pcconf, $cmd ){
-		$this->pcconf = $pcconf;
+	public function __construct( $az, $cmd ){
+		$this->az = $az;
 		$this->cmd = $cmd;
 
-		$this->project_model = $this->pcconf->factory_model_project();
+		$this->project_model = $this->az->factory_model_project();
 		$this->project_model->load_project();
 		$this->program_model = $this->project_model->factory_program();
 
-		if( strlen( $this->pcconf->req()->get_param('crawl_max_url_number') ) ){
-			$this->pcconf->set_value( 'crawl_max_url_number' , intval( $this->pcconf->req()->get_param('crawl_max_url_number') ) );
+		if( strlen( $this->az->req()->get_param('crawl_max_url_number') ) ){
+			$this->az->set_value( 'crawl_max_url_number' , intval( $this->az->req()->get_param('crawl_max_url_number') ) );
 		}
 	}
 
@@ -39,12 +43,7 @@ class pxplugin_asazuke_crawlctrl{
 	 * ファクトリ：オペレータ：コンテンツ
 	 */
 	private function factory_contents_operator(){
-		$className = 'pxplugin_asazuke_operator_contents';
-		if( !$className ){
-			$this->error_log( 'コンテンツオペレータのロードに失敗しました。' , __FILE__ , __LINE__ );
-			return	$this->exit_process();
-		}
-		$obj = new $className( $this->project_model );
+		$obj = new operator_contents( $this->az, $this->project_model );
 		return	$obj;
 	}
 
@@ -53,13 +52,8 @@ class pxplugin_asazuke_crawlctrl{
 	 * ファクトリ：オペレータ：サイトマップ
 	 */
 	private function factory_sitemap_operator(){
-		$className = 'pxplugin_asazuke_operator_sitemap';
-		if( !$className ){
-			$this->error_log( 'サイトマップオペレータのロードに失敗しました。' , __FILE__ , __LINE__ );
-			return	$this->exit_process();
-		}
 		$path_sitemap_csv = realpath( $this->get_path_download_to() ).'/sitemaps/sitemap.csv';
-		$obj = new $className( $this->project_model, $path_sitemap_csv );
+		$obj = new operator_sitemap( $this->az, $this->project_model, $path_sitemap_csv );
 		return	$obj;
 	}
 
@@ -71,10 +65,10 @@ class pxplugin_asazuke_crawlctrl{
 	 * 処理の開始
 	 */
 	public function start(){
-		if( strlen( $this->pcconf->req()->get_param('output_encoding') ) ){
-			$this->output_encoding = $this->pcconf->req()->get_param('output_encoding');
+		if( strlen( $this->az->req()->get_param('output_encoding') ) ){
+			$this->output_encoding = $this->az->req()->get_param('output_encoding');
 		}
-		if( !is_null( $this->pcconf->req()->get_param('-f') ) ){
+		if( !is_null( $this->az->req()->get_param('-f') ) ){
 			#	-fオプション(force)が指定されていたら、
 			#	アプリケーションロックを無視する。
 			$this->unlock();
@@ -106,8 +100,8 @@ class pxplugin_asazuke_crawlctrl{
 		$this->msg( 'Document root path => '.$project_model->get_path_docroot() );
 		$this->msg( 'Start page path => '.$project_model->get_path_startpage() );
 		$this->msg( 'Accept HTML file max size => '.$project_model->get_accept_html_file_max_size() );
-		$this->msg( 'crawl_max_url_number => '.$this->pcconf->get_value( 'crawl_max_url_number' ) );
-		if( !is_int( $this->pcconf->get_value( 'crawl_max_url_number' ) ) ){
+		$this->msg( 'crawl_max_url_number => '.$this->az->get_value( 'crawl_max_url_number' ) );
+		if( !is_int( $this->az->get_value( 'crawl_max_url_number' ) ) ){
 			$this->error_log( 'Config error: crawl_max_url_number is NOT a number.' , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
@@ -124,7 +118,7 @@ class pxplugin_asazuke_crawlctrl{
 		#	ダウンロード先のパス内を一旦削除
 		$path_dir_download_to = $this->get_path_download_to();
 		if( is_dir( $path_dir_download_to ) ){
-			$filelist = $this->pcconf->fs()->ls( $path_dir_download_to );
+			$filelist = $this->az->fs()->ls( $path_dir_download_to );
 			if( count( $filelist ) ){
 				$this->msg( '--------------------------------------' );
 				$this->msg( 'Cleanning directory ['.$path_dir_download_to.']...' );
@@ -132,7 +126,7 @@ class pxplugin_asazuke_crawlctrl{
 				foreach( $filelist as $filename ){
 					if( $filename == '..' || $filename == '.' ){ continue; }
 					if( $filename == 'crawl.lock' ){ continue; } //ロックファイルは消しちゃダメ。
-					if( !$this->pcconf->fs()->rm( $path_dir_download_to.'/'.$filename ) ){
+					if( !$this->az->fs()->rm( $path_dir_download_to.'/'.$filename ) ){
 						$this->error_log( 'Delete ['.$filename.'] FAILD.' , __FILE__ , __LINE__ );
 						return	$this->exit_process();
 					}else{
@@ -243,7 +237,7 @@ class pxplugin_asazuke_crawlctrl{
 				$fullpath_save_to = str_replace( '\\' , '/' , $fullpath_save_to );
 				$fullpath_savetmpfile_to = $path_dir_download_to.'/tmp_downloadcontent.tmp';
 
-				$fullpath_from = $this->pcconf->fs()->get_realpath($project_model->get_path_docroot().$url);
+				$fullpath_from = $this->az->fs()->get_realpath($project_model->get_path_docroot().$url);
 
 				clearstatcache();
 
@@ -251,7 +245,7 @@ class pxplugin_asazuke_crawlctrl{
 				// オリジナルを、一時ファイルにコピー
 				$original_filesize = filesize($fullpath_from);
 				$this->msg( 'original file size : '.$original_filesize.' byte(s)' );
-				if( !$this->pcconf->fs()->copy( $fullpath_from, $fullpath_savetmpfile_to ) ){
+				if( !$this->az->fs()->copy( $fullpath_from, $fullpath_savetmpfile_to ) ){
 					$this->error_log( 'クロール対象のファイル ['.$url.'] を一時ファイルに保存できませんでした。' , __FILE__ , __LINE__ );
 					$program_model->crawl_error( 'FAILD to copy file to; ['.$fullpath_save_to.']' , $url , $fullpath_save_to );
 				}
@@ -287,7 +281,7 @@ class pxplugin_asazuke_crawlctrl{
 							$this->error_log( 'コンテンツ設置先にファイルは存在せず、親ディレクトリに書き込み権限がありません。' , __FILE__ , __LINE__ );
 						}
 					}else{
-						if( !$this->pcconf->fs()->mkdir_all( dirname( $fullpath_save_to ) ) || !is_dir( dirname( $fullpath_save_to ) ) ){
+						if( !$this->az->fs()->mkdir_all( dirname( $fullpath_save_to ) ) || !is_dir( dirname( $fullpath_save_to ) ) ){
 							$this->error_log( 'コンテンツ設置先ディレクトリの作成に失敗しました。' , __FILE__ , __LINE__ );
 						}
 					}
@@ -349,7 +343,7 @@ class pxplugin_asazuke_crawlctrl{
 						'url'=>$url ,
 						'errors'=>$result_cont['errors'] ,
 						'original_filesize'=>$original_filesize ,
-						'extension'=>$this->pcconf->fs()->get_extension($url) ,
+						'extension'=>$this->az->fs()->get_extension($url) ,
 						'title'=>$result_sitemap['title'] ,
 						'title:replace_pattern'=>$result_sitemap['title:replace_pattern'] ,
 						'main_contents:pattern'=>$result_cont['main_contents:pattern'] ,
@@ -391,9 +385,9 @@ class pxplugin_asazuke_crawlctrl{
 				$this->msg( '残件数 '.count( $this->target_path_list ).' 件.' );
 				$this->progress_report( 'progress' , intval( $this->get_count_done_url() ).'/'.count( $this->target_path_list ) );
 
-				if( $this->get_count_done_url() >= $this->pcconf->get_value( 'crawl_max_url_number' ) ){
+				if( $this->get_count_done_url() >= $this->az->get_value( 'crawl_max_url_number' ) ){
 					#	処理可能な最大URL数を超えたらおしまい。
-					$message_string = 'URL count is OVER '.$this->pcconf->get_value( 'crawl_max_url_number' ).'.';
+					$message_string = 'URL count is OVER '.$this->az->get_value( 'crawl_max_url_number' ).'.';
 					$program_model->crawl_error( $message_string );
 					$this->msg( $message_string );
 					$this->progress_report( 'message' , $message_string );
@@ -432,14 +426,14 @@ class pxplugin_asazuke_crawlctrl{
 		}
 
 		// スキャン開始
-		$ls = $this->pcconf->fs()->ls( $path_base.$path );
+		$ls = $this->az->fs()->ls( $path_base.$path );
 		foreach( $ls as $base_name ){
 			set_time_limit(30);
 			if( is_dir( $path_base.$path.$base_name ) ){
 				// 再帰処理
 				$this->scan_starting_files($project_model, $path.$base_name.'/');
 			}elseif( is_file( $path_base.$path.$base_name ) ){
-				$ext = $this->pcconf->fs()->get_extension( $path_base.$path.$base_name );
+				$ext = $this->az->fs()->get_extension( $path_base.$path.$base_name );
 				$target_path = '/'.$path.$base_name;
 				switch( strtolower($ext) ){
 					case 'html':
@@ -525,12 +519,12 @@ class pxplugin_asazuke_crawlctrl{
 	 * ダウンロード先のディレクトリパスを得る
 	 */
 	private function get_path_download_to(){
-		$path = $this->pcconf->get_program_home_dir();
+		$path = $this->az->get_program_home_dir();
 		if( !is_dir( $path ) ){ return false; }
 
 		$RTN = realpath( $path ).'/dl';
 		if( !is_dir( $RTN ) ){
-			if( !$this->pcconf->fs()->mkdir( $RTN ) ){
+			if( !$this->az->fs()->mkdir( $RTN ) ){
 				return	false;
 			}
 		}
@@ -544,14 +538,14 @@ class pxplugin_asazuke_crawlctrl{
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
 		if( !is_dir( $path_dir_download_to.'/__LOGS__' ) ){
-			if( !$this->pcconf->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
+			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
 				return	false;
 			}
 		}
 
 		$csv_charset = mb_internal_encoding();
-		if( strlen( $this->pcconf->get_value( 'download_list_csv_charset' ) ) ){
-			$csv_charset = $this->pcconf->get_value( 'download_list_csv_charset' );
+		if( strlen( $this->az->get_value( 'download_list_csv_charset' ) ) ){
+			$csv_charset = $this->az->get_value( 'download_list_csv_charset' );
 		}
 
 		#--------------------------------------
@@ -564,10 +558,10 @@ class pxplugin_asazuke_crawlctrl{
 		#	/ 行の文字コードを調整
 		#--------------------------------------
 
-		$csv_line = $this->pcconf->fs()->mk_csv( array( $array_csv_line ) , array('charset'=>$csv_charset) );
+		$csv_line = $this->az->fs()->mk_csv( array( $array_csv_line ) , array('charset'=>$csv_charset) );
 
 		error_log( $csv_line , 3 , $path_dir_download_to.'/__LOGS__/execute_list.csv' );
-		$this->pcconf->fs()->chmod( $path_dir_download_to.'/__LOGS__/execute_list.csv' );
+		$this->az->fs()->chmod( $path_dir_download_to.'/__LOGS__/execute_list.csv' );
 
 		return	true;
 	}//save_executed_url_row();
@@ -580,7 +574,7 @@ class pxplugin_asazuke_crawlctrl{
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
 		if( !is_dir( $path_dir_download_to.'/__LOGS__' ) ){
-			if( !$this->pcconf->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
+			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/__LOGS__' ) ){
 				return	false;
 			}
 		}
@@ -593,7 +587,7 @@ class pxplugin_asazuke_crawlctrl{
 
 
 		error_log( $FIN , 3 , $path_dir_download_to.'/__LOGS__/settings.txt' );
-		$this->pcconf->fs()->chmod( $path_dir_download_to.'/__LOGS__/settings.txt' );
+		$this->az->fs()->chmod( $path_dir_download_to.'/__LOGS__/settings.txt' );
 
 		return	true;
 	}//save_crawl_settings();
@@ -605,22 +599,22 @@ class pxplugin_asazuke_crawlctrl{
 		$path_dir_download_to = realpath( $this->get_path_download_to() );
 		if( !is_dir( $path_dir_download_to ) ){ return false; }
 		if( !is_dir( $path_dir_download_to.'/sitemaps' ) ){
-			if( !$this->pcconf->fs()->mkdir( $path_dir_download_to.'/sitemaps' ) ){
+			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/sitemaps' ) ){
 				return	false;
 			}
 		}
 
-		$sitemap_definition = $this->pcconf->get_sitemap_definition();
+		$sitemap_definition = $this->az->get_sitemap_definition();
 		$sitemap_key_list = array();
 		foreach( $sitemap_definition as $row ){
 			array_push( $sitemap_key_list , '* '.$row['key'] );
 
 		}
 		$LINE = '';
-		$LINE .= $this->pcconf->fs()->mk_csv(array($sitemap_key_list), array('charset'=>'UTF-8'));
+		$LINE .= $this->az->fs()->mk_csv(array($sitemap_key_list), array('charset'=>'UTF-8'));
 
 		error_log( $LINE , 3 , $path_dir_download_to.'/sitemaps/sitemap.csv' );
-		$this->pcconf->fs()->chmod( $path_dir_download_to.'/sitemaps/sitemap.csv' );
+		$this->az->fs()->chmod( $path_dir_download_to.'/sitemaps/sitemap.csv' );
 
 		return	true;
 	}
@@ -634,7 +628,7 @@ class pxplugin_asazuke_crawlctrl{
 		$CONTENT .= $this->int2datetime( $start_time );
 		$CONTENT .= ' --- ';
 		$CONTENT .= $this->int2datetime( $end_time );
-		$result = $this->pcconf->fs()->save_file( $path_dir_download_to.'/__LOGS__/datetime.txt' , $CONTENT );
+		$result = $this->az->fs()->save_file( $path_dir_download_to.'/__LOGS__/datetime.txt' , $CONTENT );
 		return	$result;
 	}
 
@@ -642,7 +636,7 @@ class pxplugin_asazuke_crawlctrl{
 	 * エラーログを残す
 	 */
 	private function error_log( $msg , $file = null , $line = null ){
-		$this->pcconf->error_log( $msg , $file , $line );
+		$this->az->error_log( $msg , $file , $line );
 		$this->msg( '[--ERROR!!--] '.$msg );
 		return	true;
 	}
@@ -650,7 +644,7 @@ class pxplugin_asazuke_crawlctrl{
 	 * メッセージを出力する
 	 */
 	private function msg( $msg ){
-		if( $this->pcconf->req()->is_cmd() ){
+		if( $this->az->req()->is_cmd() ){
 			print	$msg."\n";
 		}else{
 			print	$msg."\n";
@@ -690,7 +684,7 @@ class pxplugin_asazuke_crawlctrl{
 		}elseif( !is_writable( dirname( $path ) ) ){
 			return	false;
 		}
-		$this->pcconf->fs()->save_file( $path , 'Cancel request: '.date('Y-m-d H:i:s')."\n" );
+		$this->az->fs()->save_file( $path , 'Cancel request: '.date('Y-m-d H:i:s')."\n" );
 		return	true;
 	}
 	private function is_request_cancel(){
@@ -707,7 +701,7 @@ class pxplugin_asazuke_crawlctrl{
 		}elseif( !is_writable( $path ) ){
 			return	false;
 		}
-		return	$this->pcconf->fs()->rm( $path );
+		return	$this->az->fs()->rm( $path );
 	}
 
 
@@ -721,7 +715,7 @@ class pxplugin_asazuke_crawlctrl{
 		$lockfilepath = $this->get_path_lockfile();
 
 		if( !@is_dir( dirname( $lockfilepath ) ) ){
-			$this->pcconf->fs()->mkdir_all( dirname( $lockfilepath ) );
+			$this->az->fs()->mkdir_all( dirname( $lockfilepath ) );
 		}
 
 		#	PHPのFileStatusCacheをクリア
@@ -737,7 +731,7 @@ class pxplugin_asazuke_crawlctrl{
 			}
 		}
 
-		$result = $this->pcconf->fs()->save_file( $lockfilepath , 'This lockfile created at: '.date( 'Y-m-d H:i:s' , time() ).'; Process ID: ['.getmypid().'];'."\n" );
+		$result = $this->az->fs()->save_file( $lockfilepath , 'This lockfile created at: '.date( 'Y-m-d H:i:s' , time() ).'; Process ID: ['.getmypid().'];'."\n" );
 		return	$result;
 	}
 
@@ -763,7 +757,7 @@ class pxplugin_asazuke_crawlctrl{
 		#	PHPのFileStatusCacheをクリア
 		clearstatcache();
 
-		return	$this->pcconf->fs()->rm( $lockfilepath );
+		return	$this->az->fs()->rm( $lockfilepath );
 	}
 
 	/**

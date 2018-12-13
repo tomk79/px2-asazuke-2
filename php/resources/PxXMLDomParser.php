@@ -1,11 +1,15 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * PxXMLDomParser
  * varsion 1.0.4
  * (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_resources_PxXMLDomParser{
+class resources_PxXMLDomParser{
 	var $last_find_selector = null; //←前回のfind()に使用したセレクタ文字列を記憶。
 	var $bin = null; //←XMLの本体を格納(String)
 

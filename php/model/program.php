@@ -1,12 +1,16 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * モデル：プログラム
  * Copyright (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_model_program{
+class model_program{
 
-	private $pcconf;
+	private $az;
 	private $proj;
 
 	private $crawl_error_list = array();
@@ -17,9 +21,9 @@ class pxplugin_asazuke_model_program{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( &$pcconf , &$proj ){
-		$this->pcconf = &$pcconf;
-		$this->proj = &$proj;
+	public function __construct( $az, $proj ){
+		$this->az = $az;
+		$this->proj = $proj;
 	}
 
 
@@ -28,7 +32,7 @@ class pxplugin_asazuke_model_program{
 	 */
 	public function load_program(){
 
-		$path_program_dir = $this->pcconf->get_program_home_dir();
+		$path_program_dir = $this->az->get_program_home_dir();
 		if( !is_dir( $path_program_dir ) ){
 			return	false;
 		}
@@ -53,7 +57,7 @@ class pxplugin_asazuke_model_program{
 	 */
 	public function delete_program_content(){
 
-		$path_program_dir = $this->pcconf->get_program_home_dir();
+		$path_program_dir = $this->az->get_program_home_dir();
 		if( !is_dir( $path_program_dir ) ){
 			return	false;
 		}
@@ -63,7 +67,7 @@ class pxplugin_asazuke_model_program{
 		}
 
 		set_time_limit(0);
-		$result = $this->pcconf->fs()->rm( $path_program_dir );
+		$result = $this->az->fs()->rm( $path_program_dir );
 		set_time_limit(30);
 		if( $result === false ){
 			return	false;
@@ -84,14 +88,14 @@ class pxplugin_asazuke_model_program{
 		}
 		array_push( $this->crawl_error_list , array( 'errormsg'=>$errormsg , 'url'=>$url , 'saveto'=>$save_to ) );
 
-		$path_program_dir = $this->pcconf->get_program_home_dir( $this->proj->get_project_id() , $this->get_program_id() );
+		$path_program_dir = $this->az->get_program_home_dir( $this->proj->get_project_id() , $this->get_program_id() );
 		$path_crawl_error_log = $path_program_dir.'/dl/__LOGS__/crawlerror.log';
 		if( !is_dir( dirname( $path_crawl_error_log ) ) || !is_writable( dirname( $path_crawl_error_log ) ) ){
-			$this->pcconf->error_log( 'Faild to save crawl error log. Directory ['.dirname( $path_crawl_error_log ).'] is NOT exists, or NOT writable.' , __FILE__ , __LINE__ );
+			$this->az->error_log( 'Faild to save crawl error log. Directory ['.dirname( $path_crawl_error_log ).'] is NOT exists, or NOT writable.' , __FILE__ , __LINE__ );
 			return	false;
 		}
 		if( is_file( $path_crawl_error_log ) && !is_writable( $path_crawl_error_log ) ){
-			$this->pcconf->error_log( 'Faild to save crawl error log. File ['.$path_crawl_error_log.'] is NOT writable.' , __FILE__ , __LINE__ );
+			$this->az->error_log( 'Faild to save crawl error log. File ['.$path_crawl_error_log.'] is NOT writable.' , __FILE__ , __LINE__ );
 			return	false;
 		}
 

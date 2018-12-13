@@ -1,11 +1,16 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * オペレータ：コンテンツ
  * Copyright (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_operator_contents{
+class operator_contents{
 
+	private $az;
 	private $obj_proj;
 	private $path = null;
 	private $report = array();
@@ -15,7 +20,8 @@ class pxplugin_asazuke_operator_contents{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $obj_proj ){
+	public function __construct( $az, $obj_proj ){
+		$this->az = $az;
 		$this->obj_proj = $obj_proj;
 	}
 
@@ -23,8 +29,7 @@ class pxplugin_asazuke_operator_contents{
 	 * ファクトリ：DOMパーサー
 	 */
 	private function factory_dom_parser($path, $type = 'path'){
-		$className = 'pxplugin_asazuke_resources_PxXMLDomParser';
-		$obj = new $className( $path, $type );
+		$obj = new resources_PxXMLDomParser( $path, $type );
 		return	$obj;
 	}
 
@@ -40,22 +45,22 @@ class pxplugin_asazuke_operator_contents{
 	 */
 	public function scrape($path, $fullpath_savetmpfile_to , $fullpath_save_to){
 		$this->path = $path;
-		$ext = $this->pcconf->fs()->get_extension($this->path);
+		$ext = $this->az->fs()->get_extension($this->path);
 		switch( strtolower($ext) ){
 			case 'html':
 				break;
 			default:
 				// HTML以外はコピーするだけ。
-				$this->pcconf->fs()->mkdir_all( dirname($fullpath_save_to) );
-				return $this->pcconf->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
+				$this->az->fs()->mkdir_all( dirname($fullpath_save_to) );
+				return $this->az->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
 				break;
 		}
 
 		if( $this->obj_proj->get_accept_html_file_max_size() > 0 && filesize( $fullpath_savetmpfile_to ) > $this->obj_proj->get_accept_html_file_max_size() ){
 			// 設定より大きいファイルは、コピーするだけ。
 			$this->report['errors'] = '[error] file size '.filesize( $fullpath_savetmpfile_to ).' byte(s) is over accept_html_file_max_size '.$this->obj_proj->get_accept_html_file_max_size().' byte(s).';
-			$this->pcconf->fs()->mkdir_all( dirname($fullpath_save_to) );
-			return $this->pcconf->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
+			$this->az->fs()->mkdir_all( dirname($fullpath_save_to) );
+			return $this->az->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
 		}
 
 		$content_src = '';
@@ -74,7 +79,7 @@ class pxplugin_asazuke_operator_contents{
 
 		$content_src = preg_replace( '/\r\n|\r|\n/si', "\r\n", $content_src );//CRLFに変換
 
-		$result = $this->pcconf->fs()->file_overwrite( $fullpath_save_to, $content_src );
+		$result = $this->az->fs()->file_overwrite( $fullpath_save_to, $content_src );
 		return $result;
 	}//scrape()
 
@@ -135,7 +140,7 @@ class pxplugin_asazuke_operator_contents{
 	public function callback_replace_dom_script( $dom , $num ){
 		$src = trim($dom['attributes']['src']);
 		if( !preg_match('/^\//', $src) ){
-			$src = $this->pcconf->fs()->get_realpath( dirname($this->path).'/'.$src );
+			$src = $this->az->fs()->get_realpath( dirname($this->path).'/'.$src );
 		}
 		if( $this->obj_proj->is_ignore_common_resources( $src ) ){
 			// 除外リソースなら削除する
@@ -156,7 +161,7 @@ class pxplugin_asazuke_operator_contents{
 		}
 		$href = trim($dom['attributes']['href']);
 		if( !preg_match('/^\//', $href) ){
-			$href = $this->pcconf->fs()->get_realpath( dirname($this->path).'/'.$href );
+			$href = $this->az->fs()->get_realpath( dirname($this->path).'/'.$href );
 		}
 		if( $this->obj_proj->is_ignore_common_resources( $href ) ){
 			// 除外リソースなら削除する

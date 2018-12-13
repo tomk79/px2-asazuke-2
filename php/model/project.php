@@ -1,12 +1,16 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * モデル：プロジェクト
  * Copyright (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_model_project{
+class model_project{
 
-	private $pcconf;
+	private $az;
 
 	private $info_project_id;
 	private $info_path_startpage = null;
@@ -25,8 +29,8 @@ class pxplugin_asazuke_model_project{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $pcconf ){
-		$this->pcconf = $pcconf;
+	public function __construct( $az ){
+		$this->az = $az;
 	}
 
 
@@ -34,11 +38,7 @@ class pxplugin_asazuke_model_project{
 	 * ファクトリ：プログラムオブジェクトを生成
 	 */
 	public function factory_program(){
-		$className = 'pxplugin_asazuke_model_program';
-		if( !$className ){
-			$this->pcconf->error_log( 'プログラムオブジェクトのロードに失敗しました。['.$objPath.']' , __FILE__ , __LINE__ );
-		}
-		$obj = new $className( $this->pcconf , $this );
+		$obj = new model_program( $this->az , $this );
 		$obj->load_program();
 
 		return	$obj;
@@ -266,7 +266,7 @@ class pxplugin_asazuke_model_project{
 
 		$project_ini_src .= ''."\n";
 
-		if( !$this->pcconf->fs()->save_file( $path_project_dir.'/project.ini' , $project_ini_src ) ){
+		if( !$this->az->fs()->save_file( $path_project_dir.'/project.ini' , $project_ini_src ) ){
 			return	false;
 		}
 
@@ -313,7 +313,7 @@ class pxplugin_asazuke_model_project{
 	 */
 	public function get_project_home_dir(){
 		// if( !strlen( $this->info_project_id ) ){ return false; }
-		$projHome = $this->pcconf->get_proj_dir( $this->info_project_id );
+		$projHome = $this->az->get_proj_dir( $this->info_project_id );
 		return	$projHome;
 	}
 
@@ -321,10 +321,10 @@ class pxplugin_asazuke_model_project{
 	 * iniファイルを読み込んで、配列にして返す。
 	 */
 	public function load_ini( $path_ini ){
-		if( !$this->pcconf->fs()->is_readable( $path_ini ) ){
+		if( !$this->az->fs()->is_readable( $path_ini ) ){
 			return	false;
 		}
-		$ini_lines = $this->pcconf->fs()->file_get_lines( $path_ini );
+		$ini_lines = $this->az->fs()->file_get_lines( $path_ini );
 		if( !is_array( $ini_lines ) ){
 			return	false;
 		}
@@ -521,7 +521,7 @@ class pxplugin_asazuke_model_project{
 						$replace_to = urlencode( preg_replace( '/^.*\.(.*?)$/' , '$1' , $PATH ) );
 						break;
 					case 'basename_body':
-						$replace_to = basename( $this->pcconf->fs()->trim_extension( $PATH ) );
+						$replace_to = basename( $this->az->fs()->trim_extension( $PATH ) );
 						break;
 					case 'wildcard':
 						if( intval($rule_result[2][$i]) > 0 ){
@@ -551,7 +551,7 @@ class pxplugin_asazuke_model_project{
 	 * UTF-8 のCSVファイルを読み込む
 	 */
 	private function read_csv_utf8( $path ){
-		return $this->pcconf->fs()->read_csv($path, array('charset'=>'utf-8'));
+		return $this->az->fs()->read_csv($path, array('charset'=>'utf-8'));
 	}
 
 }

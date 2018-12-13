@@ -1,11 +1,16 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * オペレータ：サイトマップ
  * Copyright (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_operator_sitemap{
+class operator_sitemap{
 
+	private $az;
 	private $obj_proj;
 	private $path_sitemap_csv;
 	private $report = array();
@@ -13,7 +18,8 @@ class pxplugin_asazuke_operator_sitemap{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $obj_proj, $path_sitemap_csv ){
+	public function __construct( $az, $obj_proj, $path_sitemap_csv ){
+		$this->az = $az;
 		$this->obj_proj = $obj_proj;
 		$this->path_sitemap_csv = $path_sitemap_csv;
 	}
@@ -21,9 +27,8 @@ class pxplugin_asazuke_operator_sitemap{
 	/**
 	 * ファクトリ：DOMパーサー
 	 */
-	private function &factory_dom_parser($path, $type = 'path'){
-		$className = 'pxplugin_asazuke_resources_PxXMLDomParser';
-		$obj = new $className( $path , $type );
+	private function factory_dom_parser($path, $type = 'path'){
+		$obj = new resources_PxXMLDomParser( $path , $type );
 		return	$obj;
 	}
 
@@ -38,7 +43,7 @@ class pxplugin_asazuke_operator_sitemap{
 	 * スクレイピングを実行する
 	 */
 	public function scrape($path, $fullpath_savetmpfile_to){
-		$ext = $this->pcconf->fs()->get_extension($path);
+		$ext = $this->az->fs()->get_extension($path);
 		switch( strtolower($ext) ){
 			case 'html':
 				break;
@@ -136,7 +141,7 @@ class pxplugin_asazuke_operator_sitemap{
 		foreach($links as $link){
 			$href = $link['attributes']['href'];
 			if( !preg_match('/^\//', $href) ){
-				$href = $this->pcconf->fs()->get_realpath(dirname($path).'/'.$href);
+				$href = $this->az->fs()->get_realpath(dirname($path).'/'.$href);
 			}
 			$href = preg_replace('/\/index\.html((?:\?|\#).*)?$/', '/$1', $href);
 			if( $href == $this->obj_proj->get_path_startpage() ){
@@ -152,14 +157,14 @@ class pxplugin_asazuke_operator_sitemap{
 	 * サイトマップ行を書き出す
 	 */
 	private function save_sitemap_row( $row_info ){
-		$sitemap_definition = $this->pcconf->get_sitemap_definition();
+		$sitemap_definition = $this->az->get_sitemap_definition();
 		$sitemap_val_list = array();
 		foreach( $sitemap_definition as $row ){
 			array_push( $sitemap_val_list , $row_info[$row['key']] );
 
 		}
 		$LINE = '';
-		$LINE .= $this->pcconf->fs()->mk_csv(array($sitemap_val_list), array('charset'=>'UTF-8'));
+		$LINE .= $this->az->fs()->mk_csv(array($sitemap_val_list), array('charset'=>'UTF-8'));
 
 		error_log( $LINE , 3 , $this->path_sitemap_csv );
 		return true;

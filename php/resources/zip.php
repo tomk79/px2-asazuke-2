@@ -1,18 +1,22 @@
 <?php
+/**
+ * Asazuke 2
+ */
+namespace tomk79\pickles2\asazuke2;
 
 /**
  * zip形式のファイルの結合・展開
  * Copyright (C)Tomoya Koyanagi.
  */
-class pxplugin_asazuke_resources_zip{
+class resources_zip{
 
-	private $pcconf;
+	private $az;
 
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $pcconf ){
-		$this->pcconf = $pcconf;
+	public function __construct( $az ){
+		$this->az = $az;
 	}
 
 	/**
@@ -51,7 +55,7 @@ class pxplugin_asazuke_resources_zip{
 	private function zip_add_directory( &$zip , $path_base , $path_local = null ){
 		if( !is_dir( $path_base.$path_local ) ){ return false; }
 
-		$dirlist = $this->pcconf->fs()->ls( $path_base.$path_local );
+		$dirlist = $this->az->fs()->ls( $path_base.$path_local );
 		foreach( $dirlist as $basename ){
 			if( $basename == '.' || $basename == '..' ){ continue; }
 			if( is_dir( $path_base.$path_local.'/'.$basename ) ){
