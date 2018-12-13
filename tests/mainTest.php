@@ -74,10 +74,17 @@ class mainTest extends PHPUnit_Framework_TestCase{
 				),
 			),
 		) );
+
 		$this->assertTrue( is_object($az) );
-		$crawlctrl = $az->factory_crawlctrl(array('run'));
-		$this->assertTrue( is_object($crawlctrl) );
-		$crawlctrl->start();
+
+		ob_start();
+		$az->start();
+		ob_end_clean();
+
+		$this->assertTrue( is_file(__DIR__.'/output/_logs/execute_list.csv') );
+		$this->assertTrue( is_file(__DIR__.'/output/contents/index.html') );
+		$this->assertTrue( is_file(__DIR__.'/output/sitemaps/sitemap.csv') );
+
 	}
 
 }

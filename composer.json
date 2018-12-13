@@ -19,7 +19,7 @@
     "autoload": {
         "files": [
             "php/az.php",
-            "php/crawlctrl.php",
+            "php/execute.php",
             "php/model/project.php",
             "php/operator/contents.php",
             "php/operator/sitemap.php",

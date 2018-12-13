@@ -61,6 +61,14 @@ class az{
 		return $this->config['path_output'];
 	}
 
+	/**
+	 * Asazuke 2 を実行する
+	 */
+	public function start(){
+		$exec = new execute( $this );
+		return $exec->start();
+	}
+
 
 	/**
 	 * ファクトリ：プロジェクトモデル
@@ -71,14 +79,6 @@ class az{
 	}
 
 
-
-	/**
-	 * ファクトリ：クローラインスタンスを取得
-	 */
-	public function factory_crawlctrl($cmd){
-		$obj = new crawlctrl( $this, $cmd );
-		return	$obj;
-	}
 
 	/**
 	 * サイトマップCSVの定義を取得する

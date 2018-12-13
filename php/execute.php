@@ -7,10 +7,9 @@ namespace tomk79\pickles2\asazuke2;
 /**
  * Asazuke 2
  */
-class crawlctrl{
+class execute{
 
 	private $az;
-	private $cmd;
 
 	private $project_model;
 
@@ -24,55 +23,17 @@ class crawlctrl{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $az, $cmd ){
+	public function __construct( $az ){
 		$this->az = $az;
-		$this->cmd = $cmd;
-
 		$this->project_model = $this->az->factory_model_project();
 		$this->project_model->load_project();
 	}
 
 	/**
-	 * ファクトリ：オペレータ：コンテンツ
-	 */
-	private function factory_contents_operator(){
-		$obj = new operator_contents( $this->az, $this->project_model );
-		return	$obj;
-	}
-
-
-	/**
-	 * ファクトリ：オペレータ：サイトマップ
-	 */
-	private function factory_sitemap_operator(){
-		$path_sitemap_csv = realpath( $this->get_path_download_to() ).'/sitemaps/sitemap.csv';
-		$obj = new operator_sitemap( $this->az, $this->project_model, $path_sitemap_csv );
-		return	$obj;
-	}
-
-
-	#########################################################################################################################################################
-
-
-	/**
 	 * 処理の開始
 	 */
 	public function start(){
-		while( @ob_end_clean() );//出力バッファをクリア
 		@header( 'Content-type: text/plain; charset=UTF-8' );
-
-		return	$this->controll();
-	}
-
-
-
-	#########################################################################################################################################################
-
-
-	/**
-	 * コントローラ
-	 */
-	private function controll(){
 
 		$project_model = $this->project_model;
 
@@ -219,9 +180,6 @@ class crawlctrl{
 				$path_save_to = '/contents'.$url;
 				$this->msg( 'save to ['.$path_save_to.']' );
 
-				$this->progress_report( 'url' , $url );
-				$this->progress_report( 'saveto' , $path_save_to );
-
 				$fullpath_save_to = $path_dir_download_to.$path_save_to;
 				$fullpath_save_to = str_replace( '\\' , '/' , $fullpath_save_to );
 				$fullpath_savetmpfile_to = $path_dir_download_to.'/tmp_downloadcontent.tmp';
@@ -241,8 +199,9 @@ class crawlctrl{
 				clearstatcache();
 
 				// オペレータを準備
-				$obj_contents_operator = $this->factory_contents_operator();
-				$obj_sitemap_operator = $this->factory_sitemap_operator();
+				$obj_contents_operator = new operator_contents( $this->az, $this->project_model );
+				$path_sitemap_csv = realpath( $this->get_path_download_to() ).'/sitemaps/sitemap.csv';
+				$obj_sitemap_operator = new operator_sitemap( $this->az, $this->project_model, $path_sitemap_csv );
 
 				// ----------
 				// スクレイピングしてサイトマップを追記
@@ -343,7 +302,6 @@ class crawlctrl{
 					#	これ以降の処理は不要。次へ進む。
 					$this->msg( '処理済件数 '.intval( $this->get_count_done_url() ).' 件.' );
 					$this->msg( '残件数 '.count( $this->target_path_list ).' 件.' );
-					$this->progress_report( 'progress' , intval( $this->get_count_done_url() ).'/'.count( $this->target_path_list ) );
 
 					$this->msg( '' );
 					continue;
@@ -361,13 +319,11 @@ class crawlctrl{
 
 				$this->msg( '処理済件数 '.intval( $this->get_count_done_url() ).' 件.' );
 				$this->msg( '残件数 '.count( $this->target_path_list ).' 件.' );
-				$this->progress_report( 'progress' , intval( $this->get_count_done_url() ).'/'.count( $this->target_path_list ) );
 
 				if( $this->get_count_done_url() >= $this->az->config()['crawl_max_url_number'] ){
 					#	処理可能な最大URL数を超えたらおしまい。
 					$message_string = 'URL count is OVER '.$this->az->config()['crawl_max_url_number'].'.';
 					$this->msg( $message_string );
-					$this->progress_report( 'message' , $message_string );
 					break 2;
 				}
 				$this->msg( '' );
@@ -377,15 +333,7 @@ class crawlctrl{
 
 		}
 
-		return	$this->exit_process();
-	}
-
-	/**
-	 * 進捗報告
-	 */
-	protected function progress_report( $key , $cont ){
-		#	このメソッドは、
-		#	必要に応じて拡張して利用してください。
+		return $this->exit_process();
 	}
 
 

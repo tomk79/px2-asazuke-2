@@ -1,4 +1,4 @@
-<phpunit>
+<phpunit beStrictAboutOutputDuringTests="true" verbose="true">
 	<testsuites>
 		<testsuite name="default">
 			<file>./tests/mainTest.php</file>
