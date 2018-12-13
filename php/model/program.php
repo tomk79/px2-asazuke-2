@@ -39,8 +39,8 @@ class model_program{
 
 		// $this->info_program_id = $program_id;
 
-		$programInfo = $this->proj->load_ini( $path_program_dir.'/programinfo.ini' );
-		$programInfo['section'] = $programInfo['sec'];
+		// $programInfo = $this->proj->load_project_conf( $path_program_dir.'/programinfo.json' );
+		// $programInfo['section'] = $programInfo['sec'];
 
 		return	true;
 	}

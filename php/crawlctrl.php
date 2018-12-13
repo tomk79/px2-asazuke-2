@@ -214,9 +214,12 @@ class crawlctrl{
 				$this->msg( 'Executing ['.$url.']...' );
 				$this->touch_lockfile();//ロックファイルを更新
 
-				preg_match( '/^([a-z0-9]+)\:\/\/(.+?)(\/.*)$/i' , $url , $url_info );
-				$URL_PROTOCOL = strtolower( $url_info[1] );
-				$URL_DOMAIN = strtolower( $url_info[2] );
+				$URL_PROTOCOL = null;
+				$URL_DOMAIN = null;
+				if(preg_match( '/^([a-z0-9]+)\:\/\/(.+?)(\/.*)$/i' , $url , $url_info )){
+					$URL_PROTOCOL = strtolower( $url_info[1] );
+					$URL_DOMAIN = strtolower( $url_info[2] );
+				}
 
 				#	ダウンロード先のパスを得る
 				$path_dir_download_to = $this->get_path_download_to();
@@ -281,7 +284,7 @@ class crawlctrl{
 							$this->error_log( 'コンテンツ設置先にファイルは存在せず、親ディレクトリに書き込み権限がありません。' , __FILE__ , __LINE__ );
 						}
 					}else{
-						if( !$this->az->fs()->mkdir_all( dirname( $fullpath_save_to ) ) || !is_dir( dirname( $fullpath_save_to ) ) ){
+						if( !$this->az->fs()->mkdir_r( dirname( $fullpath_save_to ) ) || !is_dir( dirname( $fullpath_save_to ) ) ){
 							$this->error_log( 'コンテンツ設置先ディレクトリの作成に失敗しました。' , __FILE__ , __LINE__ );
 						}
 					}
@@ -318,14 +321,14 @@ class crawlctrl{
 
 				#--------------------------------------
 				#	画面にメッセージを出力
-				$this->msg( 'title: ['.$result_sitemap['title'].']' );
-				$this->msg( 'title:replace_pattern: ['.$result_sitemap['title:replace_pattern'].']' );
-				$this->msg( 'main contents pattern: ['.$result_cont['main_contents:pattern'].']' );
-				if( count($result_cont['sub_contents:pattern']) ){
-					$this->msg( 'sub contents pattern: ['.implode(', ', $result_cont['sub_contents:pattern']).']' );
+				$this->msg( 'title: ['.@$result_sitemap['title'].']' );
+				$this->msg( 'title:replace_pattern: ['.@$result_sitemap['title:replace_pattern'].']' );
+				$this->msg( 'main contents pattern: ['.@$result_cont['main_contents:pattern'].']' );
+				if( is_array(@$result_cont['sub_contents:pattern']) && count(@$result_cont['sub_contents:pattern']) ){
+					$this->msg( 'sub contents pattern: ['.implode(', ', @$result_cont['sub_contents:pattern']).']' );
 				}
-				if( count($result_cont['replace_strings']) ){
-					$this->msg( 'replace strings: ['.implode(', ', $result_cont['replace_strings']).']' );
+				if( is_array(@$result_cont['replace_strings']) && count(@$result_cont['replace_strings']) ){
+					$this->msg( 'replace strings: ['.implode(', ', @$result_cont['replace_strings']).']' );
 				}
 				#	/ 画面にメッセージを出力
 				#--------------------------------------
@@ -341,15 +344,15 @@ class crawlctrl{
 				$this->save_executed_url_row(
 					array(
 						'url'=>$url ,
-						'errors'=>$result_cont['errors'] ,
+						'errors'=>@$result_cont['errors'] ,
 						'original_filesize'=>$original_filesize ,
 						'extension'=>$this->az->fs()->get_extension($url) ,
-						'title'=>$result_sitemap['title'] ,
-						'title:replace_pattern'=>$result_sitemap['title:replace_pattern'] ,
-						'main_contents:pattern'=>$result_cont['main_contents:pattern'] ,
-						'sub_contents:pattern'=>implode(', ', $result_cont['sub_contents:pattern']) ,
-						'replace_strings'=>implode(', ', $result_cont['replace_strings']) ,
-						'dom_convert'=>implode(', ', $result_cont['dom_convert']) ,
+						'title'=>@$result_sitemap['title'] ,
+						'title:replace_pattern'=>@$result_sitemap['title:replace_pattern'] ,
+						'main_contents:pattern'=>@$result_cont['main_contents:pattern'] ,
+						'sub_contents:pattern'=>@implode(', ', $result_cont['sub_contents:pattern']) ,
+						'replace_strings'=>@implode(', ', $result_cont['replace_strings']) ,
+						'dom_convert'=>@implode(', ', $result_cont['dom_convert']) ,
 						'time'=>date('Y/m/d H:i:s') ,
 					)
 				);
@@ -476,7 +479,7 @@ class crawlctrl{
 			// 定形外のURLは省く
 #		if( !preg_match( '/\.html$/' , $path ) ){ return false; }
 			// ここで扱うのは、*.html のみ
-		if( is_array( $this->target_path_list[$path] ) ){ return false; }
+		if( array_key_exists($path, $this->target_path_list) && is_array( $this->target_path_list[$path] ) ){ return false; }
 			// すでに予約済みだったら省く
 
 		$path_dir_download_to = $this->get_path_download_to();
@@ -715,7 +718,7 @@ class crawlctrl{
 		$lockfilepath = $this->get_path_lockfile();
 
 		if( !@is_dir( dirname( $lockfilepath ) ) ){
-			$this->az->fs()->mkdir_all( dirname( $lockfilepath ) );
+			$this->az->fs()->mkdir_r( dirname( $lockfilepath ) );
 		}
 
 		#	PHPのFileStatusCacheをクリア

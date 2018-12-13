@@ -186,7 +186,7 @@ class resources_PxXMLDomParser{
 					}
 				}
 
-				if( strtolower( $attr['http-equiv'] ) == 'content-type' ){
+				if( array_key_exists('http-equiv', $attr) && strtolower( $attr['http-equiv'] ) == 'content-type' ){
 					$content = trim( strtolower( $attr['content'] ) );
 					if( preg_match( '/^[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+\s*\;\s*charset\=(.*)$/si' , $content , $matched3 ) ){
 						switch( strtolower( $matched3[1] ) ){
@@ -485,9 +485,9 @@ class resources_PxXMLDomParser{
 						unset($starttag);
 					}
 					$tmpRTN = array();
-					$tmpRTN['tagName'] = $MEMO['tagOriginal'];
-					$tmpRTN['innerHTML'] = $searched_closetag['content_str'];
-					if( strlen( $searched_closetag['content_str'] ) || !strlen( $MEMO['self_closed_flg'] ) ){
+					$tmpRTN['tagName'] = @$MEMO['tagOriginal'];
+					$tmpRTN['innerHTML'] = @$searched_closetag['content_str'];
+					if( strlen( @$searched_closetag['content_str'] ) || !strlen( @$MEMO['self_closed_flg'] ) ){
 						$tmpRTN['outerHTML'] = $MEMO['start_tag'].$searched_closetag['content_str'].'</'.$MEMO['tagOriginal'].'>';
 					}else{
 						$tmpRTN['outerHTML'] = $MEMO['start_tag'];
@@ -509,7 +509,10 @@ class resources_PxXMLDomParser{
 						#	HTMLの書き換え要求への対応
 						if( is_array( $option['replace_method'] ) ){
 							if( is_object( $option['replace_method'][0] ) ){
-								$tmpRTN['outerHTML'] = $option['replace_method'][0]->$option['replace_method'][1]( $tmpRTN , count($RTN) );
+								$tmpRTN['outerHTML'] = null;
+								if( @$option['replace_method'][0] && @is_callable( $option['replace_method'][0]->$option['replace_method'][1] ) ){
+									$tmpRTN['outerHTML'] = $option['replace_method'][0]->$option['replace_method'][1]( $tmpRTN , count($RTN) );
+								}
 							}elseif( is_string( $option['replace_method'][0] ) && class_exists( $option['replace_method'][0] ) ){
 								$tmpRTN['outerHTML'] = eval( 'return '.$option['replace_method'][0].'::'.$option['replace_method'][1].'( $tmpRTN , count($RTN) );' );
 							}
@@ -617,7 +620,7 @@ class resources_PxXMLDomParser{
 									break;
 								}
 							}else{
-								if( $kouho[$i]['attribute'][$selector_att_key] == $selector_att_val ){
+								if( @$kouho[$i]['attribute'][$selector_att_key] == $selector_att_val ){
 									$att_is_hit = true;
 									break;
 								}
@@ -1008,8 +1011,9 @@ class resources_PxXMLDomParser{
 	 * HTML属性の解析
 	 */
 	function html_attribute_parse( $strings ){
+		$RTN = null;
 		preg_match_all( $this->get_pattern_attribute() , $strings , $results );
-		for( $i = 0; !is_null($results[0][$i]); $i++ ){
+		for( $i = 0; array_key_exists(0, $results) && array_key_exists($i, $results[0]) && !is_null($results[0][$i]); $i++ ){
 			if( !strlen($results[3][$i]) ){
 				$results[4][$i] = null;
 			}

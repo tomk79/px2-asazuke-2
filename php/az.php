@@ -15,28 +15,39 @@ class az{
 
 	#--------------------------------------
 	#	設定項目
+
+	/** PicklesCrawlerのホームディレクトリ設定 */
 	private $path_home_dir = null;
-		#	PicklesCrawlerのホームディレクトリ設定
 
-	private $localpath_proj_dir = '/proj';		#	プロジェクトディレクトリ
-	private $localpath_log_dir = '/logs';		#	ログディレクトリ
-	private $localpath_proc_dir = '/proc';		#	プロセス記憶ディレクトリ
+	/** プロジェクトディレクトリ */
+	private $localpath_proj_dir = '/proj';
 
+	/** ログディレクトリ */
+	private $localpath_log_dir = '/logs';
+
+	/** プロセス記憶ディレクトリ */
+	private $localpath_proc_dir = '/proc';
+
+	/**
+	 * 1回のクロールで処理できる最大URL数
+	 * URLなので、画像などのリソースファイルも含まれる。
+	 */
 	private $conf_crawl_max_url_number = 10000000;
-		#	1回のクロールで処理できる最大URL数。
-		#	URLなので、画像などのリソースファイルも含まれる。
-		#		6:44 2009/08/27 : 100000 から 10000000 に変更
 
+	/**
+	 * クロール結果を管理画面からダウンロードするときに、
+	 * ファイル名にクロール日時を含めるか否か
+	 */
 	private $conf_dl_datetime_in_filename = true;
-		#	クロール結果を管理画面からダウンロードするときに、
-		#	ファイル名にクロール日時を含めるか否か。
 
+	/**
+	 * ダウンロードリストCSVの文字コード
+	 * `null` が指定される場合、 `mb_internal_encoding()` を参照する。
+	 */
 	private $conf_download_list_csv_charset = 'SJIS-win';
-		#	ダウンロードリストCSVの文字コード。
-		#	null を指定すると、mb_internal_encoding() になる。
 
+	/** 外部コマンドのパス */
 	private $path_commands = array(
-		'php'=>'php' ,
 		'tar'=>'tar' ,
 	);
 

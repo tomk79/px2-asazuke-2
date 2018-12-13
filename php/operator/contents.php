@@ -51,7 +51,7 @@ class operator_contents{
 				break;
 			default:
 				// HTML以外はコピーするだけ。
-				$this->az->fs()->mkdir_all( dirname($fullpath_save_to) );
+				$this->az->fs()->mkdir_r( dirname($fullpath_save_to) );
 				return $this->az->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
 				break;
 		}
@@ -59,7 +59,7 @@ class operator_contents{
 		if( $this->obj_proj->get_accept_html_file_max_size() > 0 && filesize( $fullpath_savetmpfile_to ) > $this->obj_proj->get_accept_html_file_max_size() ){
 			// 設定より大きいファイルは、コピーするだけ。
 			$this->report['errors'] = '[error] file size '.filesize( $fullpath_savetmpfile_to ).' byte(s) is over accept_html_file_max_size '.$this->obj_proj->get_accept_html_file_max_size().' byte(s).';
-			$this->az->fs()->mkdir_all( dirname($fullpath_save_to) );
+			$this->az->fs()->mkdir_r( dirname($fullpath_save_to) );
 			return $this->az->fs()->copy( $fullpath_savetmpfile_to, $fullpath_save_to );
 		}
 
@@ -79,7 +79,7 @@ class operator_contents{
 
 		$content_src = preg_replace( '/\r\n|\r|\n/si', "\r\n", $content_src );//CRLFに変換
 
-		$result = $this->az->fs()->file_overwrite( $fullpath_save_to, $content_src );
+		$result = $this->az->fs()->save_file( $fullpath_save_to, $content_src );
 		return $result;
 	}//scrape()
 

@@ -160,8 +160,11 @@ class operator_sitemap{
 		$sitemap_definition = $this->az->get_sitemap_definition();
 		$sitemap_val_list = array();
 		foreach( $sitemap_definition as $row ){
-			array_push( $sitemap_val_list , $row_info[$row['key']] );
-
+			$cell = null;
+			if( array_key_exists($row['key'], $row_info) ){
+				$cell = $row_info[$row['key']];
+			}
+			array_push( $sitemap_val_list, $cell );
 		}
 		$LINE = '';
 		$LINE .= $this->az->fs()->mk_csv(array($sitemap_val_list), array('charset'=>'UTF-8'));

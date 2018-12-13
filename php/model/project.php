@@ -54,11 +54,11 @@ class model_project{
 			#	プロジェクトが存在しなければ、終了
 
 		#	基本情報
-		$project_ini = $this->load_ini( $path_project_dir.'/project.ini' );
+		$project_conf = $this->load_project_conf( $path_project_dir.'/project.json' );
 
-		$this->set_path_startpage( $project_ini['common']['path_startpage'] );
-		$this->set_path_docroot( $project_ini['common']['path_docroot'] );
-		$this->set_accept_html_file_max_size( $project_ini['common']['accept_html_file_max_size'] );
+		$this->set_path_startpage( $project_conf['path_startpage'] );
+		$this->set_path_docroot( $project_conf['path_docroot'] );
+		$this->set_accept_html_file_max_size( $project_conf['accept_html_file_max_size'] );
 
 		#	select_cont_main
 		$csv = $this->read_csv_utf8( $path_project_dir.'/select_cont_main.csv' );
@@ -251,27 +251,23 @@ class model_project{
 
 		$path_project_dir = $this->get_project_home_dir();
 
+		// プロジェクトが存在しなければ、終了
 		if( !is_dir( $path_project_dir ) ){ return false; }
-			#	プロジェクトが存在しなければ、終了
 
-		#======================================
-		#	project.ini
+		// 基本情報
+		$json = array();
+		$json['path_startpage'] = $this->get_path_startpage();
+		$json['path_docroot'] = $this->get_path_docroot();
+		$json['accept_html_file_max_size'] = $this->get_accept_html_file_max_size();
 
-		#	基本情報
-		$project_ini_src = '';
+		$project_ini_src = json_encode($json);
 
-		$project_ini_src .= 'path_startpage='.$this->get_path_startpage()."\n";
-		$project_ini_src .= 'path_docroot='.$this->get_path_docroot()."\n";
-		$project_ini_src .= 'accept_html_file_max_size='.$this->get_accept_html_file_max_size()."\n";
-
-		$project_ini_src .= ''."\n";
-
-		if( !$this->az->fs()->save_file( $path_project_dir.'/project.ini' , $project_ini_src ) ){
+		if( !$this->az->fs()->save_file( $path_project_dir.'/project.json' , $project_ini_src ) ){
 			return	false;
 		}
 
 		return	true;
-	}//save_project()
+	} // save_project()
 
 
 	/**
@@ -320,46 +316,16 @@ class model_project{
 	/**
 	 * iniファイルを読み込んで、配列にして返す。
 	 */
-	public function load_ini( $path_ini ){
-		if( !$this->az->fs()->is_readable( $path_ini ) ){
+	public function load_project_conf( $path_json ){
+		if( !$this->az->fs()->is_readable( $path_json ) ){
 			return	false;
 		}
-		$ini_lines = $this->az->fs()->file_get_lines( $path_ini );
-		if( !is_array( $ini_lines ) ){
+		$json_str = $this->az->fs()->read_file( $path_json );
+		$json = json_decode($json_str, true);
+		if( !is_array( $json ) ){
 			return	false;
 		}
-
-		$RTN = array( 'common'=>array() , 'sec'=>array() );
-		$current_section = '';
-		if( !is_array( $ini_lines ) ){ $ini_lines = array(); }
-		foreach( $ini_lines as $Line ){
-			$Line = trim( $Line );
-			if( preg_match( '/^;/' , $Line ) ){
-				#	コメント行
-				continue;
-			}
-			if( !strlen( $Line ) ){
-				#	空白行
-				continue;
-			}
-
-			if( preg_match( '/^\[(.*)\]$/' , $Line , $result ) ){
-				$current_section = $result[1];
-				$RTN['sec'][$current_section] = array();
-				continue;
-			}
-
-			if( preg_match( '/^(.*?)=(.*)$/' , $Line , $result ) ){
-				if( strlen( $current_section ) ){
-					$RTN['sec'][$current_section][trim($result[1])] = trim($result[2]);
-				}else{
-					$RTN['common'][trim($result[1])] = trim($result[2]);
-				}
-				continue;
-			}
-
-		}
-		return	$RTN;
+		return $json;
 	}
 
 
