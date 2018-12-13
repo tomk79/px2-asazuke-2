@@ -18,9 +18,6 @@ class az{
 	#--------------------------------------
 	#	設定項目
 
-	/** PicklesCrawlerのホームディレクトリ設定 */
-	private $path_home_dir = null;
-
 	/** プロジェクトディレクトリ */
 	private $localpath_proj_dir = '/proj';
 
@@ -112,79 +109,10 @@ class az{
 
 
 	/**
-	 * ホームディレクトリの設定
+	 * 出力先ディレクトリの取得
 	 */
-	public function set_home_dir( $path ){
-		if( !strlen( $path ) ){ return false; }
-		$path = $this->fs->get_realpath( $path );
-		if( !$this->fs->is_writable( $path ) ){
-			return	false;
-		}
-
-		$this->path_home_dir = $path;
-		return	true;
-	}
-	/**
-	 * ホームディレクトリの取得
-	 */
-	public function get_home_dir(){
-		return	$this->path_home_dir;
-	}
-
-	/**
-	 * プロジェクトディレクトリの取得
-	 */
-	public function get_proj_dir(){
-		if( !is_dir( $this->get_home_dir().$this->localpath_proj_dir ) ){
-			if( !$this->fs->mkdir_r( $this->get_home_dir().$this->localpath_proj_dir ) ){
-				return	false;
-			}
-		}
-		return	$this->get_home_dir().$this->localpath_proj_dir;
-	}
-
-	/**
-	 * プログラムディレクトリの取得
-	 */
-	public function get_program_home_dir(){
-		// if( !strlen( $project_id ) ){ return false; }
-		$proj_dir = $this->get_proj_dir();
-		if( !is_dir( $proj_dir ) ){
-			return	false;
-		}
-		if( !is_dir( $proj_dir.'/prg' ) ){
-			if( !$this->fs->mkdir( $proj_dir.'/prg' ) ){
-				return	false;
-			}
-		}
-		// if( strlen( $program_id ) ){
-		// 	return	$proj_dir.'/prg/';
-		// }
-		return	$proj_dir.'/prg';
-	}
-
-	/**
-	 * ログディレクトリの取得
-	 */
-	public function get_log_dir(){
-		if( !is_dir( $this->get_home_dir().$this->localpath_log_dir ) ){
-			if( !$this->fs->mkdir( $this->get_home_dir().$this->localpath_log_dir ) ){
-				return	false;
-			}
-		}
-		return	$this->get_home_dir().$this->localpath_log_dir;
-	}
-
-	/**
-	 * プロセス記憶ディレクトリの取得
-	 */
-	public function get_proc_dir(){
-		if( !is_dir( $this->get_home_dir().$this->localpath_proc_dir ) ){
-			if( !$this->fs->mkdir( $this->get_home_dir().$this->localpath_proc_dir ) ){
-				return	false;
-			}
-		}
-		return	$this->get_home_dir().$this->localpath_proc_dir;
+	public function get_output_dir(){
+		return $this->config['path_output'];
 	}
 
 

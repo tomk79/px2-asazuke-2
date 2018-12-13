@@ -13,8 +13,13 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * Test
 	 */
 	public function testStandard(){
+		$path_output = __DIR__."/output/";
+		if(!is_dir($path_output)){
+			mkdir( $path_output );
+		}
 		$az = new tomk79\pickles2\asazuke2\az( array(
 			"path_docroot" => __DIR__."/testdata/htdocs_001/",
+			"path_output" => $path_output,
 			"path_startpage" => "/",
 			"accept_html_file_max_size" => 10000000,
 			"select_cont_main" => array(
@@ -68,7 +73,6 @@ class mainTest extends PHPUnit_Framework_TestCase{
 			),
 		) );
 		$this->assertTrue( is_object($az) );
-		$az->set_home_dir(__DIR__.'/homedir/');
 		$crawlctrl = $az->factory_crawlctrl(array('run'));
 		$this->assertTrue( is_object($crawlctrl) );
 		$crawlctrl->start();

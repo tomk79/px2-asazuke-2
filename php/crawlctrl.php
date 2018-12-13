@@ -72,6 +72,7 @@ class crawlctrl{
 			$this->unlock();
 		}
 
+
 		while( @ob_end_clean() );//出力バッファをクリア
 		@header( 'Content-type: text/plain; charset='.$this->output_encoding );
 
@@ -96,8 +97,13 @@ class crawlctrl{
 		$this->msg( 'Process ID ['.getmypid().']' );
 		$this->msg( 'Document root path => '.$project_model->get_path_docroot() );
 		$this->msg( 'Start page path => '.$project_model->get_path_startpage() );
+		$this->msg( 'Output directory path => '.$this->az->get_output_dir() );
 		$this->msg( 'Accept HTML file max size => '.$project_model->get_accept_html_file_max_size() );
 		$this->msg( 'crawl_max_url_number => '.$this->az->get_value( 'crawl_max_url_number' ) );
+		if( !is_dir( $this->az->get_output_dir() ) ){
+			$this->error_log( 'Config error: path_output is NOT a directory.' , __FILE__ , __LINE__ );
+			return	$this->exit_process( false );
+		}
 		if( !is_int( $this->az->get_value( 'crawl_max_url_number' ) ) ){
 			$this->error_log( 'Config error: crawl_max_url_number is NOT a number.' , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
@@ -152,7 +158,7 @@ class crawlctrl{
 		set_time_limit(30);
 
 
-		#	CSVの定義行を保存
+		// CSVの定義行を保存
 		$this->save_executed_url_row(
 			array(
 				'url'=>'Path' ,
@@ -170,11 +176,11 @@ class crawlctrl{
 		);
 
 		#######################################
-		#	クロールの設定をログに残す
+		// クロールの設定をログに残す
 		$this->save_crawl_settings();
 
 
-		#	サイトマップを作成し始める
+		// サイトマップを作成し始める
 		$this->start_sitemap();
 
 		while( 1 ){
@@ -505,10 +511,10 @@ class crawlctrl{
 	 * ダウンロード先のディレクトリパスを得る
 	 */
 	private function get_path_download_to(){
-		$path = $this->az->get_program_home_dir();
+		$path = $this->az->get_output_dir();
 		if( !is_dir( $path ) ){ return false; }
 
-		$RTN = realpath( $path ).'/dl';
+		$RTN = $this->az->fs()->get_realpath( $path );
 		if( !is_dir( $RTN ) ){
 			if( !$this->az->fs()->mkdir( $RTN ) ){
 				return	false;

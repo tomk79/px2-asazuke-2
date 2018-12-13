@@ -38,10 +38,6 @@ class model_project{
 	 * 既存のプロジェクト情報を開いて、メンバにセット。
 	 */
 	public function load_project(){
-		// $this->info_project_id = $project_id;
-		$path_project_dir = $this->get_project_home_dir();
-		if( !is_dir( $path_project_dir ) ){ return false; }
-			#	プロジェクトが存在しなければ、終了
 
 		$project_conf = $this->az->config();
 
@@ -177,33 +173,6 @@ class model_project{
 
 
 	/**
-	 * プロジェクトの現在の状態を保存する
-	 */
-	public function save_project(){
-		// if( !strlen( $this->get_project_id() ) ){ return false; }
-
-		$path_project_dir = $this->get_project_home_dir();
-
-		// プロジェクトが存在しなければ、終了
-		if( !is_dir( $path_project_dir ) ){ return false; }
-
-		// 基本情報
-		$json = array();
-		$json['path_startpage'] = $this->get_path_startpage();
-		$json['path_docroot'] = $this->get_path_docroot();
-		$json['accept_html_file_max_size'] = $this->get_accept_html_file_max_size();
-
-		$project_ini_src = json_encode($json);
-
-		if( !$this->az->fs()->save_file( $path_project_dir.'/project.json' , $project_ini_src ) ){
-			return	false;
-		}
-
-		return	true;
-	} // save_project()
-
-
-	/**
 	 * スタートページURLの入出力
 	 */
 	public function set_path_startpage( $path_startpage ){
@@ -236,15 +205,6 @@ class model_project{
 		return	$this->info_accept_html_file_max_size;
 	}
 
-
-	/**
-	 * プロジェクトのホームディレクトリを取得する
-	 */
-	public function get_project_home_dir(){
-		// if( !strlen( $this->info_project_id ) ){ return false; }
-		$projHome = $this->az->get_proj_dir( $this->info_project_id );
-		return	$projHome;
-	}
 
 	/**
 	 * iniファイルを読み込んで、配列にして返す。
