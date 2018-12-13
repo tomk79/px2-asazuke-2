@@ -101,7 +101,7 @@ class operator_sitemap{
 	private function get_page_keywords($path){
 		$domParser = $this->factory_dom_parser($path);
 		$meta = $domParser->find('meta[name=keywords]');
-		$rtn = htmlspecialchars_decode( $meta[0]['attributes']['content'] );
+		$rtn = htmlspecialchars_decode( @$meta[0]['attributes']['content'] );
 		return $rtn;
 	}
 
@@ -111,7 +111,7 @@ class operator_sitemap{
 	private function get_page_description($path){
 		$domParser = $this->factory_dom_parser($path);
 		$meta = $domParser->find('meta[name=description]');
-		$rtn = htmlspecialchars_decode( $meta[0]['attributes']['content'] );
+		$rtn = htmlspecialchars_decode( @$meta[0]['attributes']['content'] );
 		return $rtn;
 	}
 
@@ -125,7 +125,7 @@ class operator_sitemap{
 		$breadcrumb = null;
 		foreach( $breadcrumbSelector as $selectorRow ){
 			$tmpDOM = $domParser->find($selectorRow['selector']);
-			if( is_null($tmpDOM[$selectorRow['index']]) ){
+			if( @is_null($tmpDOM[$selectorRow['index']]) ){
 				continue;
 			}
 			$breadcrumb = $tmpDOM[$selectorRow['index']]['innerHTML'];

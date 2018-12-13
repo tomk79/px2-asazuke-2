@@ -210,7 +210,7 @@ class operator_contents{
 		$src = '';
 		foreach( $selectRules as $ruleRow ){
 			$tmpDOM = $domParser->find( $ruleRow['selector'] );
-			if( is_null($tmpDOM[$ruleRow['index']]) ){
+			if( is_null(@$tmpDOM[$ruleRow['index']]) ){
 				continue;
 			}
 			$src .= '<'.'?php ob_start(); ?'.'>'."\n";
@@ -220,7 +220,7 @@ class operator_contents{
 			$src .= "\n";
 
 			// 報告
-			if( !is_array($this->report['sub_contents:pattern']) ){
+			if( !is_array(@$this->report['sub_contents:pattern']) ){
 				$this->report['sub_contents:pattern'] = array();
 			}
 			array_push( $this->report['sub_contents:pattern'], $ruleRow['name'] );
@@ -247,7 +247,7 @@ class operator_contents{
 				$str = preg_replace($ruleRow['preg_pattern'], $ruleRow['replace_to'], $str);
 
 				// 報告
-				if( !is_array($this->report['replace_strings']) ){
+				if( !@is_array($this->report['replace_strings']) ){
 					$this->report['replace_strings'] = array();
 				}
 				array_push( $this->report['replace_strings'], $ruleRow['name'] );
@@ -274,7 +274,7 @@ class operator_contents{
 				$str = $domParser->get_src();
 
 				// 報告
-				if( !is_array($this->report['dom_convert']) ){
+				if( !is_array(@$this->report['dom_convert']) ){
 					$this->report['dom_convert'] = array();
 				}
 				array_push( $this->report['dom_convert'], $ruleRow['name'] );

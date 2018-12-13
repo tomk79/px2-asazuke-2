@@ -53,131 +53,74 @@ class model_project{
 		if( !is_dir( $path_project_dir ) ){ return false; }
 			#	プロジェクトが存在しなければ、終了
 
-		#	基本情報
-		$project_conf = $this->load_project_conf( $path_project_dir.'/project.json' );
+		$project_conf = $this->az->config();
 
+		// 基本情報
 		$this->set_path_startpage( $project_conf['path_startpage'] );
 		$this->set_path_docroot( $project_conf['path_docroot'] );
 		$this->set_accept_html_file_max_size( $project_conf['accept_html_file_max_size'] );
 
-		#	select_cont_main
-		$csv = $this->read_csv_utf8( $path_project_dir.'/select_cont_main.csv' );
+		// select_cont_main
 		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
-		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['selector'] = $csvRow[1];
-			$tmpAryRow['index'] = $csvRow[2];
-			array_push($tmpAry, $tmpAryRow);
+		if( is_array( $project_conf['select_cont_main'] ) ){
+			$tmpAry = $project_conf['select_cont_main'];
 		}
 		$this->set_select_cont_main( $tmpAry );
 		unset($tmpAry);
 
-		#	select_cont_subs
-		$csv = $this->read_csv_utf8( $path_project_dir.'/select_cont_subs.csv' );
+		// select_cont_subs
 		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
+		if( is_array( $project_conf['select_cont_subs'] ) ){
+			$tmpAry = $project_conf['select_cont_subs'];
 		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['selector'] = $csvRow[1];
-			$tmpAryRow['index'] = $csvRow[2];
-			$tmpAryRow['cabinet_name'] = $csvRow[3];
-			array_push($tmpAry, $tmpAryRow);
-		}
-
 		$this->set_select_cont_subs( $tmpAry );
 		unset($tmpAry);
 
 
-		#	dom_convert
-		$csv = $this->read_csv_utf8( $path_project_dir.'/dom_convert.csv' );
+		// dom_convert
 		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
+		if( is_array( $project_conf['dom_convert'] ) ){
+			$tmpAry = $project_conf['dom_convert'];
 		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['selector'] = $csvRow[1];
-			$tmpAryRow['replace_to'] = $csvRow[2];
-			array_push($tmpAry, $tmpAryRow);
-		}
-
 		$this->set_dom_convert( $tmpAry );
 		unset($tmpAry);
 
 
-		#	select_breadcrumb
-		$csv = $this->read_csv_utf8( $path_project_dir.'/select_breadcrumb.csv' );
+		// select_breadcrumb
 		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
+		if( is_array( $project_conf['select_breadcrumb'] ) ){
+			$tmpAry = $project_conf['select_breadcrumb'];
 		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['selector'] = $csvRow[1];
-			$tmpAryRow['index'] = $csvRow[2];
-			array_push($tmpAry, $tmpAryRow);
-		}
-
 		$this->set_select_breadcrumb( $tmpAry );
 		unset($tmpAry);
 
-		#	replace_title
-		$csv = $this->read_csv_utf8( $path_project_dir.'/replace_title.csv' );
-		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
-		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['preg_pattern'] = $csvRow[1];
-			$tmpAryRow['replace_to'] = $csvRow[2];
-			array_push($tmpAry, $tmpAryRow);
-		}
 
+		 // replace_title
+		$tmpAry = array();
+		if( is_array( $project_conf['replace_title'] ) ){
+			$tmpAry = $project_conf['replace_title'];
+		}
 		$this->set_replace_title( $tmpAry );
 		unset($tmpAry);
 
-		#	replace_strings
-		$csv = $this->read_csv_utf8( $path_project_dir.'/replace_strings.csv' );
+
+		// replace_strings
 		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
-		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['preg_pattern'] = $csvRow[1];
-			$tmpAryRow['replace_to'] = $csvRow[2];
-			array_push($tmpAry, $tmpAryRow);
+		if( is_array( $project_conf['replace_strings'] ) ){
+			$tmpAry = $project_conf['replace_strings'];
 		}
 		$this->set_replace_strings( $tmpAry );
 		unset($tmpAry);
 
-		#	ignore_common_resources
-		$csv = $this->read_csv_utf8( $path_project_dir.'/ignore_common_resources.csv' );
-		$tmpAry = array();
-		if(!is_array($csv)){
-			$csv = array();
-		}
-		foreach($csv as $csvRow){
-			$tmpAryRow = array();
-			$tmpAryRow['name'] = $csvRow[0];
-			$tmpAryRow['path'] = $csvRow[1];
-			array_push($tmpAry, $tmpAryRow);
-		}
 
+		// ignore_common_resources
+		$tmpAry = array();
+		if( is_array( $project_conf['ignore_common_resources'] ) ){
+			$tmpAry = $project_conf['ignore_common_resources'];
+		}
 		$this->set_ignore_common_resources( $tmpAry );
 		unset($tmpAry);
+
 
 		return	true;
 	}//load_project()

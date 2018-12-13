@@ -13,6 +13,8 @@ class az{
 	private $fs;
 	private $req;
 
+	private $config;
+
 	#--------------------------------------
 	#	設定項目
 
@@ -52,7 +54,12 @@ class az{
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct(){
+	public function __construct( $config ){
+		$config = json_decode( json_encode( $config ), true );
+		if( !is_array( $config ) ){
+			return false;
+		}
+		$this->config = $config;
 		$this->fs = new \tomk79\filesystem();
 		$this->req = new \tomk79\request();
 	}
@@ -69,6 +76,13 @@ class az{
 	 */
 	public function req(){
 		return $this->req;
+	}
+
+	/**
+	 * $config
+	 */
+	public function config(){
+		return $this->config;
 	}
 
 	/**

@@ -507,18 +507,7 @@ class libs_PxXMLDomParser{
 						$tmpRTN['outerHTML'] = $MEMO['start_tag'];
 					}elseif( $command_name == 'replace' ){
 						#	HTMLの書き換え要求への対応
-						if( is_array( $option['replace_method'] ) ){
-							if( is_object( $option['replace_method'][0] ) ){
-								$tmpRTN['outerHTML'] = null;
-								if( @$option['replace_method'][0] && @is_callable( $option['replace_method'][0]->$option['replace_method'][1] ) ){
-									$tmpRTN['outerHTML'] = $option['replace_method'][0]->$option['replace_method'][1]( $tmpRTN , count($RTN) );
-								}
-							}elseif( is_string( $option['replace_method'][0] ) && class_exists( $option['replace_method'][0] ) ){
-								$tmpRTN['outerHTML'] = eval( 'return '.$option['replace_method'][0].'::'.$option['replace_method'][1].'( $tmpRTN , count($RTN) );' );
-							}
-						}else{
-							$tmpRTN['outerHTML'] = $option['replace_method']( $tmpRTN , count($RTN) );
-						}
+						$tmpRTN['outerHTML'] = call_user_func_array($option['replace_method'], array( $tmpRTN , count($RTN) ));
 						$MEMO['start_tag'] = $tmpRTN['outerHTML'];
 						if( count( $searched_closetag ) ){
 							$str_next = $searched_closetag['str_next'];
@@ -589,7 +578,7 @@ class libs_PxXMLDomParser{
 					if( is_array( $selectorInfo['class'] ) && count( $selectorInfo['class'] ) ){
 						$classname_is_hit = false;
 						foreach( $selectorInfo['class'] as $selector_class ){
-							foreach( preg_split( '/\s+/' , $kouho[$i]['attribute']['class'] ) as $tag_class ){
+							foreach( preg_split( '/\s+/' , @$kouho[$i]['attribute']['class'] ) as $tag_class ){
 								if( !strlen( $tag_class ) ){ continue; }
 								if( !$this->config( 'atts_case_sensitive' ) ){
 									//大文字小文字の区別をしない : PxXMLDomParser 1.0.1
