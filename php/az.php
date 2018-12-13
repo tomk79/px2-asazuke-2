@@ -46,11 +46,6 @@ class az{
 	 */
 	private $conf_download_list_csv_charset = 'SJIS-win';
 
-	/** 外部コマンドのパス */
-	private $path_commands = array(
-		'tar'=>'tar' ,
-	);
-
 	#	/ 設定項目
 	#--------------------------------------
 
@@ -178,16 +173,6 @@ class az{
 		return	$this->get_home_dir().$this->localpath_proc_dir;
 	}
 
-
-	/**
-	 * コマンドのパスを取得する
-	 */
-	public function get_path_command($cmd){
-		if( !strlen( $this->path_commands[$cmd] ) ){
-			return false;
-		}
-		return trim($this->path_commands[$cmd]);
-	}
 
 	/**
 	 * ファクトリ：プロジェクトモデル

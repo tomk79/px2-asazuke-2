@@ -29,7 +29,7 @@ class operator_contents{
 	 * ファクトリ：DOMパーサー
 	 */
 	private function factory_dom_parser($path, $type = 'path'){
-		$obj = new resources_PxXMLDomParser( $path, $type );
+		$obj = new libs_PxXMLDomParser( $path, $type );
 		return	$obj;
 	}
 

@@ -24,10 +24,7 @@
             "php/model/project.php",
             "php/operator/contents.php",
             "php/operator/sitemap.php",
-            "php/resources/io.php",
-            "php/resources/PxXMLDomParser.php",
-            "php/resources/tgz.php",
-            "php/resources/zip.php"
+            "php/libs/PxXMLDomParser.php"
         ]
     }
 }
