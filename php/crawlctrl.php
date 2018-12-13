@@ -93,9 +93,9 @@ class crawlctrl{
 		$project_model = &$this->project_model;
 		$program_model = &$this->program_model;
 
-		$this->msg( '---------- asazuke ----------' );
+		$this->msg( '---------- Asazuke 2 for Pickles 2 ----------' );
 		$this->msg( 'Copyright (C)Tomoya Koyanagi, All rights reserved.' );
-		$this->msg( '-------------------------------------' );
+		$this->msg( '---------------------------------------------' );
 		$this->msg( 'Process ID ['.getmypid().']' );
 		$this->msg( 'Document root path => '.$project_model->get_path_docroot() );
 		$this->msg( 'Start page path => '.$project_model->get_path_startpage() );
@@ -668,7 +668,7 @@ class crawlctrl{
 		$this->crawl_endtime = time();
 		$this->msg( '*** Exit --- '.$this->int2datetime( $this->crawl_endtime ) );
 		$this->save_start_and_end_datetime( $this->crawl_starttime , $this->crawl_endtime );//←開始、終了時刻の記録
-		exit;
+		return;
 	}
 
 
