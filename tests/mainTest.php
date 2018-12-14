@@ -6,6 +6,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 
 	public function setup(){
 		mb_internal_encoding('UTF-8');
+		$this->fs = new \tomk79\filesystem();
 	}
 
 
@@ -14,9 +15,10 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 */
 	public function testStandard(){
 		$path_output = __DIR__."/output/";
-		if(!is_dir($path_output)){
-			mkdir( $path_output );
-		}
+		$this->fs->rm($path_output.'_logs/');
+		$this->fs->rm($path_output.'contents/');
+		$this->fs->rm($path_output.'sitemaps/');
+
 		$az = new tomk79\pickles2\asazuke2\az(
 			__DIR__."/testdata/htdocs_001/",
 			$path_output,

@@ -46,8 +46,12 @@ class execute{
 		$this->msg( 'Output directory path => '.$this->az->get_path_output_dir() );
 		$this->msg( 'Accept HTML file max size => '.$project_model->get_accept_html_file_max_size() );
 		$this->msg( 'crawl_max_url_number => '.$this->az->config()['crawl_max_url_number'] );
+		if( !is_dir( $project_model->get_path_docroot() ) ){
+			$this->error_log( 'Config error: Document root directory is NOT exists, or NOT a directory.' , __FILE__ , __LINE__ );
+			return	$this->exit_process( false );
+		}
 		if( !is_dir( $this->az->get_path_output_dir() ) ){
-			$this->error_log( 'Config error: path_output is NOT a directory.' , __FILE__ , __LINE__ );
+			$this->error_log( 'Config error: Output directory is NOT exists, or NOT a directory.' , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
 		if( !is_int( $this->az->config()['crawl_max_url_number'] ) ){
@@ -58,32 +62,18 @@ class execute{
 		#--------------------------------------
 		#	ロック中か否かを判断
 		if( !$this->lock() ){
-			$error_msg = 'This program is locked.';
+			$error_msg = 'Asazuke 2 is locked.';
 			$this->error_log( $error_msg , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
 
 		#--------------------------------------
 		#	ダウンロード先のパス内を一旦削除
-		$path_dir_download_to = $this->get_path_download_to();
-		if( is_dir( $path_dir_download_to ) ){
-			$filelist = $this->az->fs()->ls( $path_dir_download_to );
-			if( count( $filelist ) ){
-				$this->msg( '--------------------------------------' );
-				$this->msg( 'Cleanning directory ['.$path_dir_download_to.']...' );
-				set_time_limit(0);
-				foreach( $filelist as $filename ){
-					if( $filename == '..' || $filename == '.' ){ continue; }
-					if( $filename == 'crawl.lock' ){ continue; } //ロックファイルは消しちゃダメ。
-					if( !$this->az->fs()->rm( $path_dir_download_to.'/'.$filename ) ){
-						$this->error_log( 'Delete ['.$filename.'] FAILD.' , __FILE__ , __LINE__ );
-						return	$this->exit_process();
-					}else{
-						$this->msg( 'Delete ['.$filename.'] Successful.' );
-					}
-				}
-				set_time_limit(60);
-			}
+		if( !$this->az->clear_output_files() ){
+			$this->unlock();
+			$error_msg = 'Failed to clear output files.';
+			$this->error_log( $error_msg , __FILE__ , __LINE__ );
+			return	$this->exit_process( false );
 		}
 
 		$this->msg( '--------------------------------------' );

@@ -126,6 +126,21 @@ class az{
 		return $exec->start();
 	}
 
+	/**
+	 * 出力先フォルダのファイルを消去する
+	 */
+	public function clear_output_files(){
+		$target_dir = $this->get_path_output_dir();
+		$this->fs()->rm( $target_dir.'/_logs/' );
+		$this->fs()->rm( $target_dir.'/contents/' );
+		$this->fs()->rm( $target_dir.'/sitemaps/' );
+
+		$res1 = !$this->fs()->is_dir( $target_dir.'/_logs/' );
+		$res2 = !$this->fs()->is_dir( $target_dir.'/contents/' );
+		$res3 = !$this->fs()->is_dir( $target_dir.'/sitemaps/' );
+		return ($res1 && $res2 && $res3);
+	}
+
 
 	/**
 	 * ファクトリ：プロジェクトモデル
