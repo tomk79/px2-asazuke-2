@@ -1,5 +1,22 @@
 #!/usr/bin/env php
 <?php
 require_once(__DIR__.'/vendor/autoload.php');
-echo("Welcome to Asazuke 2\n");
+$req = new \tomk79\request();
+
+$path_config_json = $req->get_cli_option('--json');
+$path_docroot = $req->get_cli_param(-2);
+$path_output = $req->get_cli_param(-1);
+$options = array();
+
+if( strlen($path_config_json) && is_file( $path_config_json ) ){
+	$str_json = file_get_contents($path_config_json);
+	$options = json_decode($str_json, true);
+}
+
+$az = new tomk79\pickles2\asazuke2\az(
+	$path_docroot,
+	$path_output,
+	$options
+);
+$az->start();
 exit;

@@ -115,18 +115,7 @@ class az{
 	 * 出力先ディレクトリの取得
 	 */
 	public function get_path_output_dir(){
-		$path = $this->path_output;
-		if( !is_dir( $path ) ){
-			return false;
-		}
-
-		$rtn = $this->fs()->get_realpath( $path.'/' );
-		if( !is_dir( $rtn ) ){
-			if( !$this->fs()->mkdir( $rtn ) ){
-				return	false;
-			}
-		}
-		return $rtn;
+		return $this->path_output;
 	}
 
 	/**

@@ -1,0 +1,55 @@
+{
+	"path_startpage": "/",
+	"accept_html_file_max_size": 10000000,
+	"crawl_max_url_number": 10000000,
+	"download_list_csv_charset": "UTF-8",
+	"select_cont_main": [
+		{
+			"name": "Primary Contents 1",
+			"selector": ".contents",
+			"index": 0
+		}
+	],
+	"select_cont_subs": [
+		{
+			"name": "Secondary Contents",
+			"selector": ".subcont",
+			"index": 0,
+			"cabinet_name": "subcont"
+		}
+	],
+	"dom_convert": [
+		{
+			"name": "Convert Test",
+			"selector": ".replace-classname-from",
+			"replace_to": "<div><p>{$innerHTML}</p></div>"
+		}
+	],
+	"select_breadcrumb": [
+		{
+			"name": "Default Breadcrumb",
+			"selector": ".breadcrumb",
+			"index": 0
+		}
+	],
+	"replace_title": [
+		{
+			"name": "Default Title",
+			"preg_pattern": "/^(.*) \\- test site 001$/s",
+			"replace_to": "$1"
+		}
+	],
+	"replace_strings": [
+		{
+			"name": "Default Replacement",
+			"preg_pattern": "/コンテンツエリア/s",
+			"replace_to": "こんてーんつえりあぁ"
+		}
+	],
+	"ignore_common_resources": [
+		{
+			"name": "test.js",
+			"path": "/js/test.js"
+		}
+	]
+}
