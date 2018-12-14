@@ -159,8 +159,8 @@ class execute{
 				}
 
 				#	ダウンロード先のパスを得る
-				$path_dir_download_to = $this->get_path_download_to();
-				if( $path_dir_download_to === false ){
+				$path_output_dir = $this->az->get_path_output_dir();
+				if( $path_output_dir === false ){
 					$this->error_log( 'ダウンロード先のディレクトリが不正です。' , __FILE__ , __LINE__ );
 					$this->target_url_done( $url );
 					return	$this->exit_process();
@@ -170,9 +170,9 @@ class execute{
 				$path_save_to = '/contents'.$url;
 				$this->msg( 'save to ['.$path_save_to.']' );
 
-				$fullpath_save_to = $path_dir_download_to.$path_save_to;
+				$fullpath_save_to = $path_output_dir.$path_save_to;
 				$fullpath_save_to = str_replace( '\\' , '/' , $fullpath_save_to );
-				$fullpath_savetmpfile_to = $path_dir_download_to.'/tmp_downloadcontent.tmp';
+				$fullpath_savetmpfile_to = $path_output_dir.'/tmp_downloadcontent.tmp';
 
 				$fullpath_from = $this->az->fs()->get_realpath($project_model->get_path_docroot().$url);
 
@@ -190,7 +190,7 @@ class execute{
 
 				// オペレータを準備
 				$obj_contents_operator = new operator_contents( $this->az, $this->project_model );
-				$path_sitemap_csv = realpath( $this->get_path_download_to() ).'/sitemaps/sitemap.csv';
+				$path_sitemap_csv = realpath( $this->az->get_path_output_dir() ).'/sitemaps/sitemap.csv';
 				$obj_sitemap_operator = new operator_sitemap( $this->az, $this->project_model, $path_sitemap_csv );
 
 				// ----------
@@ -394,10 +394,10 @@ class execute{
 		if( array_key_exists($path, $this->target_path_list) && is_array( $this->target_path_list[$path] ) ){ return false; }
 			// すでに予約済みだったら省く
 
-		$path_dir_download_to = $this->get_path_download_to();
-		if( is_dir( $path_dir_download_to.$path ) ){ return false; }
+		$path_output_dir = $this->az->get_path_output_dir();
+		if( is_dir( $path_output_dir.$path ) ){ return false; }
 			// 既に保存済みだったら省く
-		if( is_file( $path_dir_download_to.$path ) ){ return false; }
+		if( is_file( $path_output_dir.$path ) ){ return false; }
 			// 既に保存済みだったら省く
 
 
@@ -431,29 +431,13 @@ class execute{
 	}
 
 	/**
-	 * ダウンロード先のディレクトリパスを得る
-	 */
-	private function get_path_download_to(){
-		$path = $this->az->get_path_output_dir();
-		if( !is_dir( $path ) ){ return false; }
-
-		$RTN = $this->az->fs()->get_realpath( $path );
-		if( !is_dir( $RTN ) ){
-			if( !$this->az->fs()->mkdir( $RTN ) ){
-				return	false;
-			}
-		}
-		return	$RTN;
-	}
-
-	/**
 	 * ダウンロードしたURLの一覧に履歴を残す
 	 */
 	private function save_executed_url_row( $array_csv_line = array() ){
-		$path_dir_download_to = realpath( $this->get_path_download_to() );
-		if( !is_dir( $path_dir_download_to ) ){ return false; }
-		if( !is_dir( $path_dir_download_to.'/_logs' ) ){
-			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/_logs' ) ){
+		$path_output_dir = realpath( $this->az->get_path_output_dir() );
+		if( !is_dir( $path_output_dir ) ){ return false; }
+		if( !is_dir( $path_output_dir.'/_logs' ) ){
+			if( !$this->az->fs()->mkdir( $path_output_dir.'/_logs' ) ){
 				return	false;
 			}
 		}
@@ -475,8 +459,8 @@ class execute{
 
 		$csv_line = $this->az->fs()->mk_csv( array( $array_csv_line ) , array('charset'=>$csv_charset) );
 
-		error_log( $csv_line , 3 , $path_dir_download_to.'/_logs/execute_list.csv' );
-		$this->az->fs()->chmod( $path_dir_download_to.'/_logs/execute_list.csv' );
+		error_log( $csv_line , 3 , $path_output_dir.'/_logs/execute_list.csv' );
+		$this->az->fs()->chmod( $path_output_dir.'/_logs/execute_list.csv' );
 
 		return	true;
 	}//save_executed_url_row();
@@ -486,10 +470,10 @@ class execute{
 	 */
 	private function save_crawl_settings(){
 		// PicklesCrawler 0.4.2 追加
-		$path_dir_download_to = realpath( $this->get_path_download_to() );
-		if( !is_dir( $path_dir_download_to ) ){ return false; }
-		if( !is_dir( $path_dir_download_to.'/_logs' ) ){
-			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/_logs' ) ){
+		$path_output_dir = realpath( $this->az->get_path_output_dir() );
+		if( !is_dir( $path_output_dir ) ){ return false; }
+		if( !is_dir( $path_output_dir.'/_logs' ) ){
+			if( !$this->az->fs()->mkdir( $path_output_dir.'/_logs' ) ){
 				return	false;
 			}
 		}
@@ -501,8 +485,8 @@ class execute{
 
 
 
-		error_log( $FIN , 3 , $path_dir_download_to.'/_logs/settings.txt' );
-		$this->az->fs()->chmod( $path_dir_download_to.'/_logs/settings.txt' );
+		error_log( $FIN , 3 , $path_output_dir.'/_logs/settings.txt' );
+		$this->az->fs()->chmod( $path_output_dir.'/_logs/settings.txt' );
 
 		return	true;
 	}//save_crawl_settings();
@@ -511,10 +495,10 @@ class execute{
 	 * サイトマップCSVを保存する系: 先頭
 	 */
 	private function start_sitemap(){
-		$path_dir_download_to = realpath( $this->get_path_download_to() );
-		if( !is_dir( $path_dir_download_to ) ){ return false; }
-		if( !is_dir( $path_dir_download_to.'/sitemaps' ) ){
-			if( !$this->az->fs()->mkdir( $path_dir_download_to.'/sitemaps' ) ){
+		$path_output_dir = realpath( $this->az->get_path_output_dir() );
+		if( !is_dir( $path_output_dir ) ){ return false; }
+		if( !is_dir( $path_output_dir.'/sitemaps' ) ){
+			if( !$this->az->fs()->mkdir( $path_output_dir.'/sitemaps' ) ){
 				return	false;
 			}
 		}
@@ -528,8 +512,8 @@ class execute{
 		$LINE = '';
 		$LINE .= $this->az->fs()->mk_csv(array($sitemap_key_list), array('charset'=>'UTF-8'));
 
-		error_log( $LINE , 3 , $path_dir_download_to.'/sitemaps/sitemap.csv' );
-		$this->az->fs()->chmod( $path_dir_download_to.'/sitemaps/sitemap.csv' );
+		error_log( $LINE , 3 , $path_output_dir.'/sitemaps/sitemap.csv' );
+		$this->az->fs()->chmod( $path_output_dir.'/sitemaps/sitemap.csv' );
 
 		return	true;
 	}
@@ -538,12 +522,12 @@ class execute{
 	 * 開始と終了の時刻を保存する
 	 */
 	private function save_start_and_end_datetime( $start_time , $end_time ){
-		$path_dir_download_to = realpath( $this->get_path_download_to() );
+		$path_output_dir = realpath( $this->az->get_path_output_dir() );
 		$CONTENT = '';
 		$CONTENT .= $this->int2datetime( $start_time );
 		$CONTENT .= ' --- ';
 		$CONTENT .= $this->int2datetime( $end_time );
-		$result = $this->az->fs()->save_file( $path_dir_download_to.'/_logs/datetime.txt' , $CONTENT );
+		$result = $this->az->fs()->save_file( $path_output_dir.'/_logs/datetime.txt' , $CONTENT );
 		return	$result;
 	}
 
@@ -586,7 +570,7 @@ class execute{
 	 * キャンセルリクエスト
 	 */
 	public function request_cancel(){
-		$path = realpath( $this->get_path_download_to() ).'/_logs/cancel.request';
+		$path = realpath( $this->az->get_path_output_dir() ).'/_logs/cancel.request';
 		if( !is_dir( dirname( $path ) ) ){
 			return	false;
 		}
@@ -599,14 +583,14 @@ class execute{
 		return	true;
 	}
 	private function is_request_cancel(){
-		$path = realpath( $this->get_path_download_to() ).'/_logs/cancel.request';
+		$path = realpath( $this->az->get_path_output_dir() ).'/_logs/cancel.request';
 		if( is_file( $path ) ){
 			return	true;
 		}
 		return	false;
 	}
 	public function delete_request_cancel(){
-		$path = realpath( $this->get_path_download_to() ).'/_logs/cancel.request';
+		$path = realpath( $this->az->get_path_output_dir() ).'/_logs/cancel.request';
 		if( !is_file( $path ) ){
 			return	true;
 		}elseif( !is_writable( $path ) ){
@@ -669,7 +653,7 @@ class execute{
 	 * ロックファイルのパスを返す
 	 */
 	private function get_path_lockfile(){
-		return $this->az->fs()->get_realpath( $this->get_path_download_to().'/crawl.lock' );
+		return $this->az->fs()->get_realpath( $this->az->get_path_output_dir().'/crawl.lock' );
 	}
 
 	/**
