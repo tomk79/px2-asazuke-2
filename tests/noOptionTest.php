@@ -34,6 +34,19 @@ class noOptionTest extends PHPUnit_Framework_TestCase{
 		$this->assertTrue( is_file(__DIR__.'/output/contents/index.html') );
 		$this->assertTrue( is_file(__DIR__.'/output/sitemaps/sitemap.csv') );
 
+		$sitemapCsv = $this->fs->read_csv(__DIR__.'/output/sitemaps/sitemap.csv');
+		// var_dump($sitemapCsv);
+		$this->assertEquals( $sitemapCsv[4][0], '/test3.html' );
+		$this->assertEquals( $sitemapCsv[4][3], 'test3 - test site 001' );
+		$this->assertEquals( $sitemapCsv[4][8], '/test1.html>/test2.html' );
+
+		$contents = $this->fs->read_file(__DIR__.'/output/contents/index.html');
+		// var_dump($contents);
+		$this->assertSame( 1, preg_match('/<p>これはコンテンツエリア。<\/p>/', $contents) );
+		$this->assertSame( 1, preg_match('/'.preg_quote('<p class="replace-classname-from">DOM置き換えテスト</p>', '/').'/', $contents) );
+		$this->assertSame( 1, preg_match('/'.preg_quote('<p class="replace-classname-from"><?= \'DOM置き換えテスト\' ?></p>', '/').'/', $contents) );
+		$this->assertSame( 1, preg_match('/'.preg_quote('<p class="replace-classname-from"><?php print(\'DOM置き換えテスト\'); ?></p>', '/').'/', $contents) );
+		$this->assertSame( 1, preg_match('/サブコンテンツエリア/', $contents) );
 	}
 
 }
