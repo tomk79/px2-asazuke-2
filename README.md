@@ -49,8 +49,46 @@ $az->start();
 $ php az2 --json options.json path/to/documentroot/ path/to/output_dir/
 ```
 
+1つ目の引数には HTMLファイルが格納されているディレクトリを、
+2つ目の引数には 結果を出力する先のディレクトリ (空白のディレクトリをお勧めします) を渡します。
+
 `--json` に、オプション(後述)をJSON形式で保存したファイルのパスを指定します。
 JSONファイルの記述サンプルが [options_sample.json](options_sample.json) に同梱されていますので参考にしてください。
+
+
+### PXコマンドとして使う
+
+`px-files/config.php` に次のように設定します。
+
+```php
+/**
+ * funcs: Before sitemap
+ *
+ * サイトマップ読み込みの前に実行するプラグインを設定します。
+ */
+$conf->funcs->before_sitemap = array(
+
+    /* ... 中略... */
+
+    // PX=asazuke2
+    'tomk79\pickles2\asazuke2\az::register('.json_encode(array(
+        'path_docroot' => "path/to/documentroot/", // HTMLファイルが格納されているディレクトリ
+        'path_output' => "path/to/output_dir/", // 結果を出力する先のディレクトリ (空白のディレクトリをお勧めします)
+        'options' => array(
+            // オプション (後述)
+        ),
+    )).')' ,
+
+    /* ... 中略... */
+
+);
+```
+
+設定したら、次のPXコマンドからスクレイピングを実行できるようになります。
+
+```
+$ php .px_execute.php /?PX=asazuke2.run
+```
 
 
 ## オプション - Options

@@ -20,7 +20,10 @@ class cleaningTest extends PHPUnit_Framework_TestCase{
 		$this->fs->rm($path_output.'_logs/');
 		$this->fs->rm($path_output.'contents/');
 		$this->fs->rm($path_output.'sitemaps/');
+		shell_exec('php '.__DIR__.'/testdata/px2doc001/.px_execute.php /?PX=clearcache');
+
 		clearstatcache();
+
 		$this->assertFalse( is_dir($path_output.'_logs/') );
 		$this->assertFalse( is_dir($path_output.'contents/') );
 		$this->assertFalse( is_dir($path_output.'sitemaps/') );

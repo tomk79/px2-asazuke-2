@@ -17,6 +17,43 @@ class az{
 	private $path_output;
 
 	/**
+	 * Before sitemap function
+	 * @param object $px Picklesオブジェクト
+	 * @param object $json プラグイン設定
+	 */
+	public static function register( $px, $json ){
+
+		if( !is_object($json) ){
+			$json = json_decode('{}');
+		}
+		if( !property_exists($json, 'path_docroot') ){
+			$json->path_docroot = null;
+		}
+		if( !property_exists($json, 'path_output') ){
+			$json->path_output = null;
+		}
+		if( !property_exists($json, 'options') ){
+			$json->options = array();
+		}
+		$json->options = json_decode( json_encode($json->options), true );
+		// var_dump($json);
+
+		$self = new self(
+			$json->path_docroot,
+			$json->path_output,
+			$json->options
+		);
+
+		$px->pxcmd()->register('asazuke2', function($px) use($self){
+			$pxcmd = $px->get_px_command();
+			if( @$pxcmd[1] == 'run' ){
+				$self->start();
+				exit;
+			}
+		});
+	}
+
+	/**
 	 * コンストラクタ
 	 */
 	public function __construct( $path_docroot, $path_output, $config = array() ){

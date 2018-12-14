@@ -5,7 +5,7 @@
 namespace tomk79\pickles2\asazuke2;
 
 /**
- * Asazuke 2
+ * Execute Asazuke 2
  */
 class execute{
 

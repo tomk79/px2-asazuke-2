@@ -3,6 +3,7 @@
 		<testsuite name="default">
 			<file>./tests/mainTest.php</file>
 			<file>./tests/noOptionTest.php</file>
+			<file>./tests/pxcommandTest.php</file>
 			<file>./tests/cleaningTest.php</file>
 		</testsuite>
 	</testsuites>
