@@ -13,21 +13,71 @@ class az{
 	private $fs;
 	private $config;
 
-	#--------------------------------------
-	#	設定項目
-	private $conf_crawl_max_url_number = 10000000;
-	private $conf_download_list_csv_charset = 'SJIS-win';
-	#	/ 設定項目
-	#--------------------------------------
+	private $path_docroot;
+	private $path_output;
 
 	/**
 	 * コンストラクタ
 	 */
-	public function __construct( $config ){
+	public function __construct( $path_docroot, $path_output, $config = array() ){
+		$this->path_docroot = $path_docroot;
+		$this->path_output = $path_output;
 		$config = json_decode( json_encode( $config ), true );
 		if( !is_array( $config ) ){
 			return false;
 		}
+
+		// オプション値の初期化
+		if( !array_key_exists('path_startpage', $config) || !strlen($config['path_startpage']) ){
+			$config['path_startpage'] = '/';
+		}
+		if( !array_key_exists('accept_html_file_max_size', $config) || !is_int($config['accept_html_file_max_size']) ){
+			$config['accept_html_file_max_size'] = 10000000;
+		}
+		if( !array_key_exists('crawl_max_url_number', $config) || !is_int($config['crawl_max_url_number']) ){
+			$config['crawl_max_url_number'] = 10000000;
+		}
+		if( !array_key_exists('download_list_csv_charset', $config) || !strlen($config['download_list_csv_charset']) ){
+			$config['download_list_csv_charset'] = 'UTF-8';
+		}
+		if( !array_key_exists('select_cont_main', $config) || !is_array($config['select_cont_main']) ){
+			$config['select_cont_main'] = array();
+		}
+		if( !array_key_exists('select_cont_subs', $config) || !is_array($config['select_cont_subs']) ){
+			$config['select_cont_subs'] = array();
+		}
+		if( !array_key_exists('dom_convert', $config) || !is_array($config['dom_convert']) ){
+			$config['dom_convert'] = array();
+		}
+		if( !array_key_exists('select_breadcrumb', $config) || !is_array($config['select_breadcrumb']) ){
+			$config['select_breadcrumb'] = array();
+		}
+		if( !array_key_exists('replace_title', $config) || !is_array($config['replace_title']) ){
+			$config['replace_title'] = array();
+		}
+		if( !array_key_exists('replace_strings', $config) || !is_array($config['replace_strings']) ){
+			$config['replace_strings'] = array();
+		}
+		if( !array_key_exists('ignore_common_resources', $config) || !is_array($config['ignore_common_resources']) ){
+			$config['ignore_common_resources'] = array();
+		}
+
+		array_push($config['select_cont_main'], array(
+			"name" => "<body>",
+			"selector" => "body",
+			"index" => 0,
+		));
+		array_push($config['select_cont_main'], array(
+			"name" => "<html>",
+			"selector" => "html",
+			"index" => 0,
+		));
+		array_push($config['select_breadcrumb'], array(
+			"name" => ".breadcrumb",
+			"selector" => ".breadcrumb",
+			"index" => 0,
+		));
+
 		$this->config = $config;
 		$this->fs = new \tomk79\filesystem();
 	}
@@ -55,10 +105,17 @@ class az{
 
 
 	/**
+	 * ドキュメントルートディレクトリの取得
+	 */
+	public function get_path_docroot(){
+		return $this->path_docroot;
+	}
+
+	/**
 	 * 出力先ディレクトリの取得
 	 */
-	public function get_output_dir(){
-		return $this->config['path_output'];
+	public function get_path_output_dir(){
+		return $this->path_output;
 	}
 
 	/**

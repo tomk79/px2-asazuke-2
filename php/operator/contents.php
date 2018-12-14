@@ -115,7 +115,7 @@ class operator_contents{
 		$src .= '<'.'?php ob_start(); ?'.'>'."\n";
 		$src .= '<'.'?php /* ------ head section contents ------ */ ?'.'>'."\n";
 		$src .= $header_src."\n";
-		$src .= '<'.'?php $px->theme()->send_content(ob_get_clean(), '.json_encode( 'head' ).'); ?'.'>'."\n";
+		$src .= '<'.'?php $px->bowl()->put(ob_get_clean(), '.json_encode( 'head' ).'); ?'.'>'."\n";
 		$src .= "\n";
 
 		return $src;
@@ -216,7 +216,7 @@ class operator_contents{
 			$src .= '<'.'?php ob_start(); ?'.'>'."\n";
 			$src .= '<'.'?php /* ------ sub contents '.json_encode( $ruleRow['cabinet_name'] ).' ------ */ ?'.'>'."\n";
 			$src .= $this->src_standard_replacement( $tmpDOM[$ruleRow['index']]['innerHTML'] )."\n";
-			$src .= '<'.'?php $px->theme()->send_content(ob_get_clean(), '.json_encode( $ruleRow['cabinet_name'] ).'); ?'.'>'."\n";
+			$src .= '<'.'?php $px->bowl()->put(ob_get_clean(), '.json_encode( $ruleRow['cabinet_name'] ).'); ?'.'>'."\n";
 			$src .= "\n";
 
 			// 報告
@@ -260,7 +260,6 @@ class operator_contents{
 	 * DOM置換を実行する。
 	 */
 	private function dom_convert( $str ){
-		// [UTODO] 開発中
 		$replaceRules = $this->obj_proj->get_dom_convert();
 
 		foreach( $replaceRules as $ruleRow ){

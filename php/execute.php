@@ -43,10 +43,10 @@ class execute{
 		$this->msg( 'Process ID ['.getmypid().']' );
 		$this->msg( 'Document root path => '.$project_model->get_path_docroot() );
 		$this->msg( 'Start page path => '.$project_model->get_path_startpage() );
-		$this->msg( 'Output directory path => '.$this->az->get_output_dir() );
+		$this->msg( 'Output directory path => '.$this->az->get_path_output_dir() );
 		$this->msg( 'Accept HTML file max size => '.$project_model->get_accept_html_file_max_size() );
 		$this->msg( 'crawl_max_url_number => '.$this->az->config()['crawl_max_url_number'] );
-		if( !is_dir( $this->az->get_output_dir() ) ){
+		if( !is_dir( $this->az->get_path_output_dir() ) ){
 			$this->error_log( 'Config error: path_output is NOT a directory.' , __FILE__ , __LINE__ );
 			return	$this->exit_process( false );
 		}
@@ -444,7 +444,7 @@ class execute{
 	 * ダウンロード先のディレクトリパスを得る
 	 */
 	private function get_path_download_to(){
-		$path = $this->az->get_output_dir();
+		$path = $this->az->get_path_output_dir();
 		if( !is_dir( $path ) ){ return false; }
 
 		$RTN = $this->az->fs()->get_realpath( $path );

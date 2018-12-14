@@ -43,7 +43,7 @@ class model_project{
 
 		// 基本情報
 		$this->set_path_startpage( $project_conf['path_startpage'] );
-		$this->set_path_docroot( $project_conf['path_docroot'] );
+		$this->set_path_docroot( $this->az->get_path_docroot() );
 		$this->set_accept_html_file_max_size( $project_conf['accept_html_file_max_size'] );
 
 		// select_cont_main
