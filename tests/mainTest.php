@@ -26,7 +26,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 				"path_startpage" => "/",
 				"accept_html_file_max_size" => 10000000,
 				"crawl_max_url_number" => 10000000, // 1回のクロールで処理できる最大URL数, URLなので、画像などのリソースファイルも含まれる。
-				"download_list_csv_charset" => "UTF-8", // ダウンロードリストCSVの文字コード: `null` が指定される場合、 `mb_internal_encoding()` を参照する。
+				"execute_list_csv_charset" => "UTF-8", // ダウンロードリストCSVの文字コード: `null` が指定される場合、 `mb_internal_encoding()` を参照する。
 				"select_cont_main" => array(
 					array(
 						"name" => "Primary Contents 1",
@@ -39,7 +39,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 						"name" => "Secondary Contents",
 						"selector" => ".subcont",
 						"index" => 0,
-						"cabinet_name" => "subcont",
+						"bowl_name" => "subcont",
 					),
 				),
 				"dom_convert" => array(
@@ -72,6 +72,10 @@ class mainTest extends PHPUnit_Framework_TestCase{
 				),
 				"ignore_common_resources" => array(
 					array(
+						"name" => "common",
+						"path" => "/common/*",
+					),
+					array(
 						"name" => "test.js",
 						"path" => "/js/test.js",
 					),
@@ -98,6 +102,9 @@ class mainTest extends PHPUnit_Framework_TestCase{
 
 		$contents = $this->fs->read_file(__DIR__.'/output/contents/index.html');
 		// var_dump($contents);
+		$this->assertSame( 0, preg_match('/'.preg_quote('href="/common/css/style.css"', '/').'/', $contents) );
+		$this->assertSame( 0, preg_match('/'.preg_quote('src="/js/test.js"', '/').'/', $contents) );
+		$this->assertSame( 1, preg_match('/'.preg_quote('src="/js/test2.js"', '/').'/', $contents) );
 		$this->assertSame( 1, preg_match('/<p>これはこんてーんつえりあぁ。<\/p>/', $contents) );
 		$this->assertSame( 1, preg_match('/'.preg_quote('<div><p>DOM置き換えテスト</p></div>', '/').'/', $contents) );
 		$this->assertSame( 1, preg_match('/'.preg_quote('<div><p><?= \'DOM置き換えテスト\' ?></p></div>', '/').'/', $contents) );

@@ -166,7 +166,7 @@ class operator_contents{
 		if( $this->obj_proj->is_ignore_common_resources( $href ) ){
 			// 除外リソースなら削除する
 			// 報告
-			if( !is_array($this->report['ignore_common_resources']) ){
+			if( !is_array(@$this->report['ignore_common_resources']) ){
 				$this->report['ignore_common_resources'] = array();
 			}
 			array_push( $this->report['ignore_common_resources'], $this->obj_proj->last_matched_ignore_common_resources() );
@@ -214,9 +214,9 @@ class operator_contents{
 				continue;
 			}
 			$src .= '<'.'?php ob_start(); ?'.'>'."\n";
-			$src .= '<'.'?php /* ------ sub contents '.json_encode( $ruleRow['cabinet_name'] ).' ------ */ ?'.'>'."\n";
+			$src .= '<'.'?php /* ------ sub contents '.json_encode( $ruleRow['bowl_name'] ).' ------ */ ?'.'>'."\n";
 			$src .= $this->src_standard_replacement( $tmpDOM[$ruleRow['index']]['innerHTML'] )."\n";
-			$src .= '<'.'?php $px->bowl()->put(ob_get_clean(), '.json_encode( $ruleRow['cabinet_name'] ).'); ?'.'>'."\n";
+			$src .= '<'.'?php $px->bowl()->put(ob_get_clean(), '.json_encode( $ruleRow['bowl_name'] ).'); ?'.'>'."\n";
 			$src .= "\n";
 
 			// 報告

@@ -28,36 +28,48 @@ class az{
 		}
 
 		// オプション値の初期化
+
+		// トップページのパス
 		if( !array_key_exists('path_startpage', $config) || !strlen($config['path_startpage']) ){
 			$config['path_startpage'] = '/';
 		}
+		// 解析するHTMLファイルの最大容量(bytes)
 		if( !array_key_exists('accept_html_file_max_size', $config) || !is_int($config['accept_html_file_max_size']) ){
 			$config['accept_html_file_max_size'] = 10000000;
 		}
+		// 処理するURL数(=ファイル数) の上限
 		if( !array_key_exists('crawl_max_url_number', $config) || !is_int($config['crawl_max_url_number']) ){
 			$config['crawl_max_url_number'] = 10000000;
 		}
-		if( !array_key_exists('download_list_csv_charset', $config) || !strlen($config['download_list_csv_charset']) ){
-			$config['download_list_csv_charset'] = 'UTF-8';
+		// `execute_list.csv` の文字セット
+		if( !array_key_exists('execute_list_csv_charset', $config) || !strlen($config['execute_list_csv_charset']) ){
+			$config['execute_list_csv_charset'] = 'UTF-8';
 		}
+		// メインコンテンツエリアの抽出条件
 		if( !array_key_exists('select_cont_main', $config) || !is_array($config['select_cont_main']) ){
 			$config['select_cont_main'] = array();
 		}
+		// サブコンテンツエリアの抽出条件
 		if( !array_key_exists('select_cont_subs', $config) || !is_array($config['select_cont_subs']) ){
 			$config['select_cont_subs'] = array();
 		}
+		// 特定のDOM要素を別のタグやクラス名などの構造に変換する
 		if( !array_key_exists('dom_convert', $config) || !is_array($config['dom_convert']) ){
 			$config['dom_convert'] = array();
 		}
+		// パンくず情報の抽出条件
 		if( !array_key_exists('select_breadcrumb', $config) || !is_array($config['select_breadcrumb']) ){
 			$config['select_breadcrumb'] = array();
 		}
+		// ページ名の置換条件
 		if( !array_key_exists('replace_title', $config) || !is_array($config['replace_title']) ){
 			$config['replace_title'] = array();
 		}
+		// 文字列置換パターン
 		if( !array_key_exists('replace_strings', $config) || !is_array($config['replace_strings']) ){
 			$config['replace_strings'] = array();
 		}
+		// コンテンツから取り除く共有のリソースのパス
 		if( !array_key_exists('ignore_common_resources', $config) || !is_array($config['ignore_common_resources']) ){
 			$config['ignore_common_resources'] = array();
 		}

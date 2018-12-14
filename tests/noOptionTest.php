@@ -42,6 +42,9 @@ class noOptionTest extends PHPUnit_Framework_TestCase{
 
 		$contents = $this->fs->read_file(__DIR__.'/output/contents/index.html');
 		// var_dump($contents);
+		$this->assertSame( 1, preg_match('/'.preg_quote('href="/common/css/style.css"', '/').'/', $contents) );
+		$this->assertSame( 1, preg_match('/'.preg_quote('src="/js/test.js"', '/').'/', $contents) );
+		$this->assertSame( 1, preg_match('/'.preg_quote('src="/js/test2.js"', '/').'/', $contents) );
 		$this->assertSame( 1, preg_match('/<p>これはコンテンツエリア。<\/p>/', $contents) );
 		$this->assertSame( 1, preg_match('/'.preg_quote('<p class="replace-classname-from">DOM置き換えテスト</p>', '/').'/', $contents) );
 		$this->assertSame( 1, preg_match('/'.preg_quote('<p class="replace-classname-from"><?= \'DOM置き換えテスト\' ?></p>', '/').'/', $contents) );

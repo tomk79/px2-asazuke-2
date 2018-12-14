@@ -443,8 +443,8 @@ class execute{
 		}
 
 		$csv_charset = mb_internal_encoding();
-		if( strlen( $this->az->config()['download_list_csv_charset'] ) ){
-			$csv_charset = $this->az->config()['download_list_csv_charset'];
+		if( strlen( $this->az->config()['execute_list_csv_charset'] ) ){
+			$csv_charset = $this->az->config()['execute_list_csv_charset'];
 		}
 
 		#--------------------------------------

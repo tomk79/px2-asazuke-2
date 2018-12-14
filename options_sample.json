@@ -2,7 +2,7 @@
 	"path_startpage": "/",
 	"accept_html_file_max_size": 10000000,
 	"crawl_max_url_number": 10000000,
-	"download_list_csv_charset": "UTF-8",
+	"execute_list_csv_charset": "UTF-8",
 	"select_cont_main": [
 		{
 			"name": "Primary Contents 1",
@@ -15,7 +15,7 @@
 			"name": "Secondary Contents",
 			"selector": ".subcont",
 			"index": 0,
-			"cabinet_name": "subcont"
+			"bowl_name": "subcont"
 		}
 	],
 	"dom_convert": [
