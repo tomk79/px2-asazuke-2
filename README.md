@@ -1,6 +1,6 @@
 # Asazuke 2
 
-Asazuke 2 は、既存のウェブサイトのデータを解析し、Pickles 2 の形式に置換するスクレイピングツールです。
+Asazuke 2 は、既存のウェブサイトのデータを解析し、[Pickles 2](https://pickles2.pxt.jp/) の形式に置換するスクレイピングツールです。
 
 Pickles Framework 1.x 用に開発された [asazuke plugin](https://github.com/tomk79/PxPlugin_asazuke) を Pickles 2 向けに移植したものです。
 
@@ -266,4 +266,4 @@ Pickles 2 のテンプレート構造では、 サイト全体で共有するリ
 
 - Tomoya Koyanagi <tomk79@gmail.com>
 - website: <https://www.pxt.jp/>
-- Twitter: @tomk79 <http://twitter.com/tomk79/>
+- Twitter: @tomk79 <https://twitter.com/tomk79/>

@@ -112,6 +112,8 @@ class operator_contents{
 
 		$header_src = $domParser->get_src();
 
+		$header_src = $this->src_standard_replacement( $header_src );
+
 		$src .= '<'.'?php ob_start(); ?'.'>'."\n";
 		$src .= '<'.'?php /* ------ head section contents ------ */ ?'.'>'."\n";
 		$src .= $header_src."\n";
@@ -138,7 +140,11 @@ class operator_contents{
 	 * callback: scriptタグを置き換える。
 	 */
 	public function callback_replace_dom_script( $dom , $num ){
-		$src = trim($dom['attributes']['src']);
+		$src = null;
+		if( array_key_exists( 'src', $dom['attributes'] ) ){
+			$src = $dom['attributes']['src'];
+		}
+		$src = trim($src);
 		if( !preg_match('/^\//', $src) ){
 			$src = $this->az->fs()->get_realpath( dirname($this->path).'/'.$src );
 		}
